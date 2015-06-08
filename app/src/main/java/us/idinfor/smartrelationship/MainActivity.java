@@ -30,9 +30,10 @@ public class MainActivity extends BaseActivity {
     Button mStartListeningBtn;
     @InjectView(R.id.stop_listening_btn)
     Button mStopListeningBtn;
+    @InjectView(R.id.save_btn)
+    Button mSaveBtn;
 
     SharedPreferences prefs;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +46,7 @@ public class MainActivity extends BaseActivity {
     }
 
     @OnClick(R.id.start_listening_btn)
-    public void startListening(){
+    public void startListening() {
         Intent intent = new Intent();
         intent.setAction(Constants.START_LISTENING);
         sendBroadcast(intent);
@@ -88,12 +89,13 @@ public class MainActivity extends BaseActivity {
         if (cancel) {
             focusView.requestFocus();
         } else {
+            Utils.hideSoftKeyboard(this);
             prefs.edit()
                     .putInt(Constants.PROPERTY_BLUETOOTH_SCAN_FRECUENCY, Integer.valueOf(scanFrecuency))
                     .putInt(Constants.PROPERTY_VOICE_RECORD_DURATION, Integer.valueOf(recordDuration))
                     .apply();
             Snackbar
-                    .make(view,"Datos guardados",Snackbar.LENGTH_LONG).show();
+                    .make(view, "Datos guardados", Snackbar.LENGTH_LONG).show();
         }
 
     }
@@ -105,9 +107,16 @@ public class MainActivity extends BaseActivity {
         if (getListeningState()) {
             mStartListeningBtn.setEnabled(false);
             mStopListeningBtn.setEnabled(true);
+            mBluetoothScanFrecuencyEdit.setEnabled(false);
+            mVoiceRecordDurationEdit.setEnabled(false);
+            mSaveBtn.setEnabled(false);
         } else {
             mStartListeningBtn.setEnabled(true);
             mStopListeningBtn.setEnabled(false);
+            mBluetoothScanFrecuencyEdit.setEnabled(true);
+            mVoiceRecordDurationEdit.setEnabled(true);
+            mSaveBtn.setEnabled(true);
+
         }
     }
 

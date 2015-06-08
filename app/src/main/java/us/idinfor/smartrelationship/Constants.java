@@ -8,4 +8,5 @@ public class Constants {
     public static final String PROPERTY_LISTENING = "listening";
     public static final String START_LISTENING = PACKAGE_NAME + ".START_LISTENING";
     public static final String STOP_LISTENING = PACKAGE_NAME + ".STOP_LISTENING";
+    public static final String PROPERTY_AUDIO_IS_RECORDING = "audio_is_recording";
 }

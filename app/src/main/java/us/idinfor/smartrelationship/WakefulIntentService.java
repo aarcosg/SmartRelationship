@@ -22,7 +22,7 @@ import android.os.PowerManager;
 abstract public class WakefulIntentService extends IntentService {
   abstract void doWakefulWork(Intent intent);
   
-  public static final String LOCK_NAME_STATIC="us.idinfor.smartrelationship.AppService.Static";
+  public static final String LOCK_NAME_STATIC="us.idinfor.smartrelationship.Service.Static";
   private static PowerManager.WakeLock lockStatic=null;
   
   public static void acquireStaticLock(Context context) {

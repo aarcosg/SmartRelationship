@@ -21,9 +21,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.SystemClock;
 import android.text.TextUtils;
+import android.util.Log;
 
 public class OnListeningStateChangedReceiver extends BroadcastReceiver {
 
+    private static final String TAG = OnListeningStateChangedReceiver.class.getCanonicalName();
     private static AlarmManager alarmManager;
   
    @Override
@@ -32,11 +34,13 @@ public class OnListeningStateChangedReceiver extends BroadcastReceiver {
        Intent i=new Intent(context, OnAlarmReceiver.class);
        PendingIntent pi=PendingIntent.getBroadcast(context, 0, i, 0);
        if(TextUtils.equals(intent.getAction(),Constants.START_LISTENING)){
+           Log.e(TAG, "alarmanager.setrepeating");
           alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
                   SystemClock.elapsedRealtime()+60000,
-                  Utils.getSharedPreferences(context).getInt(Constants.PROPERTY_BLUETOOTH_SCAN_FRECUENCY,5)*1000,
+                  Utils.getSharedPreferences(context).getInt(Constants.PROPERTY_BLUETOOTH_SCAN_FRECUENCY,10)*1000,
                   pi);
       }else if (TextUtils.equals(intent.getAction(),Constants.STOP_LISTENING)){
+           Log.e(TAG, "alarmanager.cancel");
            alarmManager.cancel(pi);
       }
 
