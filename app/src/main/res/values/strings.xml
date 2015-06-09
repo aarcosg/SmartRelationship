@@ -11,6 +11,8 @@
     <string name="preferences">Preferences</string>
     <string name="error_scan_frecuency">Scan frecuency must be greater than 0</string>
     <string name="error_record_duration">Record duration must be greater than 0</string>
+    <string name="error_scan_freq_lower_record_duration">Scan frecuency must be greater than record duration</string>
     <string name="connected">Connected</string>
     <string name="disconnected">Disconnected</string>
+    <string name="preferences_saved">Preferences saved</string>
 </resources>

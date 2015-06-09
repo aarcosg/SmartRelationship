@@ -2,6 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="us.idinfor.smartrelationship" >
 
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
@@ -28,8 +32,28 @@
                 <action android:name="us.idinfor.smartrelationship.STOP_LISTENING" />
             </intent-filter>
         </receiver>
+        <!-- Bluetooth -->
+        <receiver android:name=".OnBluetoothScanResultReceiver">
+            <intent-filter>
+                <action android:name="android.bluetooth.device.action.FOUND"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.bluetooth.adapter.action.DISCOVERY_STARTED"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.bluetooth.adapter.action.DISCOVERY_FINISHED"/>
+            </intent-filter>
+        </receiver>
+        <!-- Wifi -->
+        <receiver android:name=".OnWifiScanResultReceiver">
+            <intent-filter>
+                <action android:name="android.net.wifi.SCAN_RESULTS"/>
+            </intent-filter>
+        </receiver>
         <receiver android:name=".OnAlarmReceiver"/>
-        <service android:name=".ListeningService" android:exported="false"/>
+        <service android:name=".AudioRecorderService" android:exported="false"/>
+        <service android:name=".BluetoothScanService" android:exported="false"/>
+        <service android:name=".WifiScanService" android:exported="false"/>
     </application>
 
 </manifest>

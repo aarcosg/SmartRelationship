@@ -6,7 +6,9 @@ public class Constants {
     public static final String PROPERTY_BLUETOOTH_SCAN_FRECUENCY = "bluetooth_scan_frecuency";
     public static final String PROPERTY_VOICE_RECORD_DURATION = "voice_record_duration";
     public static final String PROPERTY_LISTENING = "listening";
+    public static final String PROPERTY_LISTENING_ID  = "listening_id";
     public static final String START_LISTENING = PACKAGE_NAME + ".START_LISTENING";
     public static final String STOP_LISTENING = PACKAGE_NAME + ".STOP_LISTENING";
-    public static final String PROPERTY_AUDIO_IS_RECORDING = "audio_is_recording";
+    public static final String AUDIO_RECORDER_FOLDER = "AudioRecorder";
+    public static final String AUDIO_RECORDER_FILE_EXT = ".mp3";
 }
