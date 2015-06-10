@@ -21,7 +21,7 @@ public class OnBluetoothScanResultReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.i(TAG, "OnBluetoothScanResultReceiver@onReceive");
-        WakefulIntentService.acquireStaticLock(context);
+        WakefulIntentService.acquireStaticLock(context,Constants.LOCK_BLUETOOTH_SCAN_SERVICE);
 
         if(BluetoothDevice.ACTION_FOUND.equals(intent.getAction())){
             BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
@@ -33,13 +33,14 @@ public class OnBluetoothScanResultReceiver extends BroadcastReceiver {
         } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(intent.getAction())){
             Log.i(TAG, "Bluetooth discovery finished");
             Gson gson = new Gson();
+            Long listeningId = Utils.getSharedPreferences(context).getLong(Constants.PROPERTY_LISTENING_ID,0L);
             LogRecord logRecord = new LogRecord(
-                     Utils.getSharedPreferences(context).getLong(Constants.PROPERTY_LISTENING_ID,0L)
+                     listeningId
                     ,LogRecord.Type.BLUETHOOTH
                     ,System.currentTimeMillis()
                     ,devices
                     ,null);
-            Utils.writeToLogFile(gson.toJson(logRecord));
+            Utils.writeToLogFile(Constants.BLUETOOTH_LOG_FOLDER,listeningId,gson.toJson(logRecord));
             /*StringBuilder stringBuilder = new StringBuilder();
             //Date
             stringBuilder.append(System.currentTimeMillis());

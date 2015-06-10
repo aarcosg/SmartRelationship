@@ -1,10 +1,9 @@
 package us.idinfor.smartrelationship;
 
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
+import android.content.SharedPreferences;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.util.Log;
@@ -21,9 +20,10 @@ public class OnWifiScanResultReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.i(TAG, "OnWifiScanResultReceiver@onReceive");
-        WakefulIntentService.acquireStaticLock(context);
+        WakefulIntentService.acquireStaticLock(context,Constants.LOCK_WIFI_SCAN_SERVICE);
         if (WifiManager.SCAN_RESULTS_AVAILABLE_ACTION.equals(intent.getAction())) {
             Log.i(TAG,"Wifi networks found");
+            SharedPreferences prefs = Utils.getSharedPreferences(context);
             WifiManager wifiManager = (WifiManager)context.getSystemService(Context.WIFI_SERVICE);
             List<ScanResult> networks = wifiManager.getScanResults();
             List<WifiNetwork> wifiNetworks = new ArrayList<>();
@@ -32,24 +32,14 @@ public class OnWifiScanResultReceiver extends BroadcastReceiver {
                 wifiNetworks.add(wifiNetwork);
             }
             Gson gson = new Gson();
+            Long listeningId = prefs.getLong(Constants.PROPERTY_LISTENING_ID, 0L);
             LogRecord logRecord = new LogRecord(
-                    Utils.getSharedPreferences(context).getLong(Constants.PROPERTY_LISTENING_ID,0L)
+                    listeningId
                     ,LogRecord.Type.WIFI
                     ,System.currentTimeMillis()
                     ,null
                     ,wifiNetworks);
-            Utils.writeToLogFile(gson.toJson(logRecord));
-            //TODO
-            ComponentName component = new ComponentName(context, WifiScanService.class);
-            int status = context.getPackageManager().getComponentEnabledSetting(component);
-            if(status == PackageManager.COMPONENT_ENABLED_STATE_ENABLED) {
-                //Disable
-                context.getPackageManager().setComponentEnabledSetting(component, PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-            } else if(status == PackageManager.COMPONENT_ENABLED_STATE_DISABLED) {
-                //Enable
-                //context.getPackageManager().setComponentEnabledSetting(component, PackageManager.COMPONENT_ENABLED_STATE_ENABLED , PackageManager.DONT_KILL_APP);
-            }
-
+            Utils.writeToLogFile(Constants.WIFI_LOG_FOLDER,listeningId,gson.toJson(logRecord));
         }
 
     }

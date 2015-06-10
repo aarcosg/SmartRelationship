@@ -41,7 +41,6 @@ public class MainActivity extends BaseActivity {
 
     SharedPreferences prefs;
     boolean bluetoothEnabled = false;
-    BluetoothManager mBluetoothManager;
 
 
     @Override
@@ -52,32 +51,29 @@ public class MainActivity extends BaseActivity {
         ButterKnife.inject(this);
         buildActionBarToolbar(getString(R.string.app_name), false);
         setButtonsEnabledState();
-        mBluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
-
+        loadPreferences();
     }
+
 
     @OnClick(R.id.start_listening_btn)
     public void startListening() {
         checkBluetooth();
         if(bluetoothEnabled){
+            setListeningState(true);
             Intent intent = new Intent();
             intent.setAction(Constants.START_LISTENING);
             sendBroadcast(intent);
-            setListeningState(true);
             setButtonsEnabledState();
         }
     }
 
     @OnClick(R.id.stop_listening_btn)
     public void stopListening() {
+        setListeningState(false);
         Intent intent = new Intent();
         intent.setAction(Constants.STOP_LISTENING);
         sendBroadcast(intent);
-        setListeningState(false);
         setButtonsEnabledState();
-        if(mBluetoothManager.getAdapter() != null){
-            mBluetoothManager.getAdapter().cancelDiscovery();
-        }
     }
 
     @OnClick(R.id.save_btn)
@@ -201,6 +197,12 @@ public class MainActivity extends BaseActivity {
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
+
+    private void loadPreferences() {
+        mBluetoothScanFrecuencyEdit.setText(Integer.valueOf(prefs.getInt(Constants.PROPERTY_BLUETOOTH_SCAN_FRECUENCY,30)).toString());
+        mVoiceRecordDurationEdit.setText(Integer.valueOf(prefs.getInt(Constants.PROPERTY_VOICE_RECORD_DURATION,5)).toString());
+    }
+
 
 
 }

@@ -27,27 +27,21 @@
         <receiver android:name=".OnListeningStateChangedReceiver">
             <intent-filter>
                 <action android:name="us.idinfor.smartrelationship.START_LISTENING" />
-            </intent-filter>
-            <intent-filter>
                 <action android:name="us.idinfor.smartrelationship.STOP_LISTENING" />
             </intent-filter>
         </receiver>
-        <!-- Bluetooth -->
-        <receiver android:name=".OnBluetoothScanResultReceiver">
-            <intent-filter>
-                <action android:name="android.bluetooth.device.action.FOUND"/>
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.bluetooth.adapter.action.DISCOVERY_STARTED"/>
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.bluetooth.adapter.action.DISCOVERY_FINISHED"/>
-            </intent-filter>
-        </receiver>
         <!-- Wifi -->
-        <receiver android:name=".OnWifiScanResultReceiver">
+        <receiver android:name=".OnWifiScanResultReceiver" android:exported="false">
             <intent-filter>
                 <action android:name="android.net.wifi.SCAN_RESULTS"/>
+            </intent-filter>
+        </receiver>
+        <!-- Bluetooth -->
+        <receiver android:name=".OnBluetoothScanResultReceiver" android:exported="true">
+            <intent-filter>
+                <action android:name="android.bluetooth.device.action.FOUND"/>
+                <action android:name="android.bluetooth.adapter.action.DISCOVERY_STARTED"/>
+                <action android:name="android.bluetooth.adapter.action.DISCOVERY_FINISHED"/>
             </intent-filter>
         </receiver>
         <receiver android:name=".OnAlarmReceiver"/>

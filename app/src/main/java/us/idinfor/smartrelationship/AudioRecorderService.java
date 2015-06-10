@@ -11,49 +11,55 @@ import java.io.IOException;
 public class AudioRecorderService extends WakefulIntentService {
 
     private static final String TAG = AudioRecorderService.class.getCanonicalName();
-    private static MediaRecorder recorder;
+    private static MediaRecorder recorder = new MediaRecorder();
 
     public AudioRecorderService() {
-        super("ListeningService");
+        super("AudioRecorderService");
     }
 
     @Override
     protected void doWakefulWork(Intent intent) {
-        recorder = getMediaRecorderInstance();
-        Log.i(TAG, "ListeningService@doWakefulWork");
+        //recorder = getMediaRecorderInstance();
+        if (recorder == null) {
+            recorder = new MediaRecorder();
+        }
+        Log.i(TAG, "AudioRecorderService@doWakefulWork");
         String path = Environment.getExternalStorageDirectory().getAbsolutePath()
+                + "/" + Constants.ROOT_FOLDER
                 + "/" + Constants.AUDIO_RECORDER_FOLDER
-                + "/" + Utils.getSharedPreferences(this).getLong(Constants.PROPERTY_LISTENING_ID,0L)
+                + "/" + Utils.getSharedPreferences(this).getLong(Constants.PROPERTY_LISTENING_ID, 0L)
                 + "_" + System.currentTimeMillis()
                 + Constants.AUDIO_RECORDER_FILE_EXT;
         File directory = new File(path).getParentFile();
         if (!directory.exists() && !directory.mkdirs()) {
-           Log.e(TAG,"Can't make audio recorder directory");
+            Log.e(TAG, "Can't make audio recorder directory");
         }
         recorder.reset();
         recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
         recorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
         recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
         recorder.setOutputFile(path);
-        recorder.setMaxDuration(Utils.getSharedPreferences(this).getInt(Constants.PROPERTY_VOICE_RECORD_DURATION,5)*1000);
+        recorder.setMaxDuration(Utils.getSharedPreferences(this).getInt(Constants.PROPERTY_VOICE_RECORD_DURATION, 5) * 1000);
         try {
             recorder.prepare();
         } catch (IOException e) {
-            Log.e(TAG,e.getMessage());
+            Log.e(TAG, e.getMessage());
             e.printStackTrace();
         }
-        recorder.start();
+        try {
+            recorder.start();
+        } catch (Exception e) {
+            Log.e(TAG, e.getMessage());
+        }
 
     }
 
-    private MediaRecorder getMediaRecorderInstance(){
-        if(recorder == null){
+    private MediaRecorder getMediaRecorderInstance() {
+        if (recorder == null) {
             recorder = new MediaRecorder();
         }
         return recorder;
     }
-
-
 
 
 }

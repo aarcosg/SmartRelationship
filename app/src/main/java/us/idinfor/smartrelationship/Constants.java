@@ -11,4 +11,10 @@ public class Constants {
     public static final String STOP_LISTENING = PACKAGE_NAME + ".STOP_LISTENING";
     public static final String AUDIO_RECORDER_FOLDER = "AudioRecorder";
     public static final String AUDIO_RECORDER_FILE_EXT = ".mp3";
+    public static final String LOCK_BLUETOOTH_SCAN_SERVICE = PACKAGE_NAME + ".OnBluetoothScanResultReceiver";
+    public static final String LOCK_WIFI_SCAN_SERVICE = PACKAGE_NAME + ".OnWifiScanResultReceiver";
+    public static final String LOCK_ALARM_SERVICE = PACKAGE_NAME + ".OnAlarmReceiver";
+    public static final String BLUETOOTH_LOG_FOLDER = "Bluetooth";
+    public static final String WIFI_LOG_FOLDER = "Wifi";
+    public static final String ROOT_FOLDER = "SmartRelationship";
 }

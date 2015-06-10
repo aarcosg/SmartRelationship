@@ -26,9 +26,16 @@ public class Utils {
         inputMethodManager.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), 0);
     }
 
-    synchronized public static void writeToLogFile(String msg){
+    synchronized public static void writeToLogFile(String folder, Long id, String msg){
         File log = new File(Environment.getExternalStorageDirectory().getAbsolutePath()
-                + "/" + Constants.AUDIO_RECORDER_FOLDER + "/log.txt");
+                + "/" + Constants.ROOT_FOLDER
+                + "/" + folder
+                + "/" + id + "_" + System.currentTimeMillis() + ".json");
+        File directory = log.getParentFile();
+        if (!directory.exists() && !directory.mkdirs()) {
+            Log.e(TAG,"Can't make " + folder + " directory");
+        }
+
         try{
             BufferedWriter out = new BufferedWriter(new FileWriter(log.getAbsolutePath(),log.exists()));
             out.write(msg);
