@@ -15,11 +15,13 @@
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
+        android:name=".SmartRelationshipApplication"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
             android:name=".MainActivity"
-            android:label="@string/app_name" >
+            android:label="@string/app_name"
+            android:configChanges="orientation|screenSize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -46,17 +48,14 @@
                 <action android:name="android.bluetooth.adapter.action.DISCOVERY_FINISHED"/>
             </intent-filter>
         </receiver>
-        <!-- Recognition Activity -->
-        <receiver android:name=".OnActivityRecognitionResultReceiver" android:exported="false">
-            <intent-filter>
-                <action android:name="us.idinfor.smartrelationship.ACTION_ACTIVITY_RECOGNITION_RESULTS"/>
-            </intent-filter>
-        </receiver>
+        <!-- Activity Recognition -->
+        <receiver android:name=".ActivityRecognitionReceiver"/>
+
         <receiver android:name=".OnAlarmReceiver"/>
         <service android:name=".AudioRecorderService" android:exported="false"/>
         <service android:name=".BluetoothScanService" android:exported="false"/>
         <service android:name=".WifiScanService" android:exported="false"/>
-        <service android:name=".ActivityRecognitionService" android:exported="false"/>
+        <service android:name=".OnActivityRecognitionResultService" android:exported="false"/>
     </application>
 
 </manifest>

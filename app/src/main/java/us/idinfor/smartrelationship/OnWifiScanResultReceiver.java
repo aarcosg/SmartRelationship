@@ -21,31 +21,35 @@ public class OnWifiScanResultReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         Log.i(TAG, "OnWifiScanResultReceiver@onReceive");
         WakefulIntentService.acquireStaticLock(context,Constants.LOCK_WIFI_SCAN_SERVICE);
-        if (WifiManager.SCAN_RESULTS_AVAILABLE_ACTION.equals(intent.getAction())) {
-            Log.i(TAG,"Wifi networks found");
-            SharedPreferences prefs = Utils.getSharedPreferences(context);
-            WifiManager wifiManager = (WifiManager)context.getSystemService(Context.WIFI_SERVICE);
-            List<ScanResult> networks = wifiManager.getScanResults();
-            List<WifiNetwork> wifiNetworks = new ArrayList<>();
-            for(ScanResult scanResult : networks){
-                WifiNetwork wifiNetwork = new WifiNetwork(scanResult.BSSID
-                        ,scanResult.SSID
-                        ,scanResult.frequency
-                        ,scanResult.level
-                        ,scanResult.timestamp);
-                wifiNetworks.add(wifiNetwork);
+        if(Utils.getSharedPreferences(context).getBoolean(Constants.PROPERTY_LISTENING,false)){
+            if (WifiManager.SCAN_RESULTS_AVAILABLE_ACTION.equals(intent.getAction())) {
+                Log.i(TAG,"Wifi networks found");
+                SharedPreferences prefs = Utils.getSharedPreferences(context);
+                WifiManager wifiManager = (WifiManager)context.getSystemService(Context.WIFI_SERVICE);
+                List<ScanResult> networks = wifiManager.getScanResults();
+                List<WifiNetwork> wifiNetworks = new ArrayList<>();
+                for(ScanResult scanResult : networks){
+                    WifiNetwork wifiNetwork = new WifiNetwork(scanResult.BSSID
+                            ,scanResult.SSID
+                            ,scanResult.frequency
+                            ,scanResult.level
+                            ,scanResult.timestamp);
+                    wifiNetworks.add(wifiNetwork);
+                }
+                Gson gson = new Gson();
+                Long listeningId = prefs.getLong(Constants.PROPERTY_LISTENING_ID, 0L);
+                LogRecord logRecord = new LogRecord(
+                        listeningId
+                        ,LogRecord.Type.WIFI
+                        ,System.currentTimeMillis()
+                        ,null
+                        ,wifiNetworks
+                        ,null);
+                Utils.writeToLogFile(Constants.WIFI_LOG_FOLDER
+                        ,Utils.getTimeStamp() + ";" + listeningId + ";" + gson.toJson(logRecord));
             }
-            Gson gson = new Gson();
-            Long listeningId = prefs.getLong(Constants.PROPERTY_LISTENING_ID, 0L);
-            LogRecord logRecord = new LogRecord(
-                    listeningId
-                    ,LogRecord.Type.WIFI
-                    ,System.currentTimeMillis()
-                    ,null
-                    ,wifiNetworks);
-            Utils.writeToLogFile(Constants.WIFI_LOG_FOLDER
-                    ,Utils.getTimeStamp() + ";" + listeningId + ";" + gson.toJson(logRecord));
         }
+
 
     }
 }

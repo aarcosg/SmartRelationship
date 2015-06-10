@@ -11,15 +11,17 @@ public class LogRecord {
     private Long time;
     private Set<BTDevice> devices;
     private List<WifiNetwork> networks;
+    private List<DetectedActivity> activities;
 
     public LogRecord(){}
 
-    public LogRecord(Long id, Type type, Long time, Set<BTDevice> devices, List<WifiNetwork> networks) {
+    public LogRecord(Long id, Type type, Long time, Set<BTDevice> devices, List<WifiNetwork> networks, List<DetectedActivity> activities) {
         this.id = id;
         this.type = type;
         this.time = time;
         this.devices = devices;
         this.networks = networks;
+        this.activities = activities;
     }
 
     public Long getId() {
@@ -60,6 +62,14 @@ public class LogRecord {
 
     public void setNetworks(List<WifiNetwork> networks) {
         this.networks = networks;
+    }
+
+    public List<DetectedActivity> getActivities() {
+        return activities;
+    }
+
+    public void setActivities(List<DetectedActivity> activities) {
+        this.activities = activities;
     }
 
     public enum Type{

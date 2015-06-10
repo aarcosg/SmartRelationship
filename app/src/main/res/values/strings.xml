@@ -15,4 +15,13 @@
     <string name="connected">Connected</string>
     <string name="disconnected">Disconnected</string>
     <string name="preferences_saved">Preferences saved</string>
+
+    <string name="in_vehicle">in_vehicle</string>
+    <string name="on_bicycle">on_bicycle</string>
+    <string name="on_foot">on_foot</string>
+    <string name="running">running</string>
+    <string name="still">still</string>
+    <string name="tilting">tilting</string>
+    <string name="unknown">unknown</string>
+    <string name="walking">walking</string>
 </resources>

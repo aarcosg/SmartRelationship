@@ -1,6 +1,7 @@
 package us.idinfor.smartrelationship;
 
 import android.app.Activity;
+import android.app.PendingIntent;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
 import android.content.Context;
@@ -18,12 +19,14 @@ import android.widget.EditText;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.ActivityRecognition;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
 
-public class MainActivity extends BaseActivity {
+public class MainActivity extends BaseActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private static final String TAG = MainActivity.class.getCanonicalName();
     private static final int REQUEST_ENABLE_BT = 1;
@@ -47,6 +50,9 @@ public class MainActivity extends BaseActivity {
     SharedPreferences prefs;
     boolean bluetoothEnabled = false;
     BluetoothAdapter mBluetoothAdapter;
+    GoogleApiClient mGoogleApiClient;
+    PendingIntent mActivityRecognitionPI;
+    boolean startRecognition;
 
 
     @Override
@@ -58,18 +64,32 @@ public class MainActivity extends BaseActivity {
         buildActionBarToolbar(getString(R.string.app_name), false);
         setButtonsEnabledState();
         loadPreferences();
+        checkPlayServices();
+        if (mGoogleApiClient == null) {
+            buildGoogleApiClient();
+        }
+        if(!mGoogleApiClient.isConnected()){
+            mGoogleApiClient.connect();
+        }
+
+
     }
 
 
     @OnClick(R.id.start_listening_btn)
     public void startListening() {
         checkBluetooth();
-        if(checkPlayServices() && bluetoothEnabled){
+        if (bluetoothEnabled) {
             setListeningState(true);
             Intent intent = new Intent();
             intent.setAction(Constants.ACTION_START_LISTENING);
             sendBroadcast(intent);
             setButtonsEnabledState();
+            if (mGoogleApiClient.isConnected()) {
+                startActivityRecognition();
+            } else {
+                startRecognition = true;
+            }
         }
     }
 
@@ -80,6 +100,9 @@ public class MainActivity extends BaseActivity {
         intent.setAction(Constants.ACTION_STOP_LISTENING);
         sendBroadcast(intent);
         setButtonsEnabledState();
+        if (mGoogleApiClient.isConnected()) {
+            stopActivityRecognition();
+        }
     }
 
     @OnClick(R.id.save_btn)
@@ -103,7 +126,7 @@ public class MainActivity extends BaseActivity {
             mVoiceRecordDurationTil.setError(getString(R.string.error_record_duration));
             cancel = true;
             focusView = mVoiceRecordDurationEdit;
-        } else if (Integer.valueOf(scanfrequency) <= Integer.valueOf(recordDuration)){
+        } else if (Integer.valueOf(scanfrequency) <= Integer.valueOf(recordDuration)) {
             mSampleScanfrequencyTil.setError(getString(R.string.error_scan_freq_lower_record_duration));
             cancel = true;
             focusView = mSampleScanfrequencyEdit;
@@ -163,7 +186,7 @@ public class MainActivity extends BaseActivity {
                 .apply();
     }
 
-    private void checkBluetooth(){
+    private void checkBluetooth() {
         // Use this check to determine whether BLE is supported on the device.  Then you can
         // selectively disable BLE-related features.
         if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
@@ -178,7 +201,7 @@ public class MainActivity extends BaseActivity {
         // Checks if Bluetooth is supported on the device.
         if (mBluetoothAdapter == null) {
             bluetoothEnabled = false;
-        } else if (!mBluetoothAdapter.isEnabled()){
+        } else if (!mBluetoothAdapter.isEnabled()) {
             // Ensures Bluetooth is enabled on the device.  If Bluetooth is not currently enabled,
             // fire an intent to display a dialog asking the user to grant permission to enable it.
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
@@ -190,12 +213,12 @@ public class MainActivity extends BaseActivity {
 
     }
 
-    private void checkBluetoothDiscoverable(){
-        if(mBluetoothAdapter.getScanMode() != BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE){
+    private void checkBluetoothDiscoverable() {
+        if (mBluetoothAdapter.getScanMode() != BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE) {
             Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
             discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 0);
-            startActivityForResult(discoverableIntent,REQUEST_ENABLE_DISCOVERABLE_BT);
-        }else{
+            startActivityForResult(discoverableIntent, REQUEST_ENABLE_DISCOVERABLE_BT);
+        } else {
             bluetoothEnabled = true;
         }
     }
@@ -206,12 +229,12 @@ public class MainActivity extends BaseActivity {
         if (requestCode == REQUEST_ENABLE_BT && resultCode == Activity.RESULT_CANCELED) {
             bluetoothEnabled = false;
             return;
-        } else if (requestCode == REQUEST_ENABLE_BT && resultCode == Activity.RESULT_OK){
+        } else if (requestCode == REQUEST_ENABLE_BT && resultCode == Activity.RESULT_OK) {
             /*bluetoothEnabled = true;
             startListening();
             return;*/
             checkBluetoothDiscoverable();
-        } else if (requestCode == REQUEST_ENABLE_DISCOVERABLE_BT && resultCode == Activity.RESULT_OK){
+        } else if (requestCode == REQUEST_ENABLE_DISCOVERABLE_BT && resultCode == Activity.RESULT_OK) {
             bluetoothEnabled = true;
             startListening();
             return;
@@ -220,8 +243,8 @@ public class MainActivity extends BaseActivity {
     }
 
     private void loadPreferences() {
-        mSampleScanfrequencyEdit.setText(Integer.valueOf(prefs.getInt(Constants.PROPERTY_SAMPLE_SCAN_FREQUENCY,30)).toString());
-        mVoiceRecordDurationEdit.setText(Integer.valueOf(prefs.getInt(Constants.PROPERTY_VOICE_RECORD_DURATION,5)).toString());
+        mSampleScanfrequencyEdit.setText(Integer.valueOf(prefs.getInt(Constants.PROPERTY_SAMPLE_SCAN_FREQUENCY, 30)).toString());
+        mVoiceRecordDurationEdit.setText(Integer.valueOf(prefs.getInt(Constants.PROPERTY_VOICE_RECORD_DURATION, 5)).toString());
     }
 
     /**
@@ -243,6 +266,70 @@ public class MainActivity extends BaseActivity {
         return true;
     }
 
+    /**
+     * Builds a GoogleApiClient. Uses the {@code #addApi} method to request the
+     * ActivityRecognition API.
+     */
+    protected synchronized void buildGoogleApiClient() {
+        Log.d(TAG, "Building GoogleApiClient");
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(ActivityRecognition.API)
+                .build();
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        Log.i(TAG, "Google Play Services connected");
+        if (startRecognition) {
+            startActivityRecognition();
+            startRecognition = false;
+        }
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        // The connection to Google Play services was lost for some reason. We call connect() to
+        // attempt to re-establish the connection.
+        Log.w(TAG, "Google Play Services connection suspended");
+        mGoogleApiClient.connect();
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        Log.w(TAG, "Google Play Services connection failed");
+    }
+
+    /**
+     * Gets a PendingIntent to be sent for each activity detection.
+     */
+    private PendingIntent getActivityRecognitionPendingIntent() {
+        if (mActivityRecognitionPI == null) {
+            Intent intent = new Intent(this,OnActivityRecognitionResultService.class);
+            mActivityRecognitionPI = PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        }
+        return mActivityRecognitionPI;
+    }
+
+    private void startActivityRecognition() {
+        Log.i(TAG, "startActivityRecognition");
+        ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates(
+                mGoogleApiClient,
+                prefs.getInt(Constants.PROPERTY_SAMPLE_SCAN_FREQUENCY, 30) / 2,
+                getActivityRecognitionPendingIntent()
+        );
+
+    }
+
+    private void stopActivityRecognition() {
+        Log.i(TAG, "stoptActivityRecognition");
+        ActivityRecognition.ActivityRecognitionApi.removeActivityUpdates(
+                mGoogleApiClient,
+                getActivityRecognitionPendingIntent()
+        );
+
+    }
 
 
 }

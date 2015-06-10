@@ -23,4 +23,5 @@ public class Constants {
     public static final int PLAY_SERVICES_RESOLUTION_REQUEST  = 9000;
     public static final long ACTIVITY_DETECTION_INTERVAL_IN_MILLISECONDS = 0;
     public static final String ACTION_ACTIVITY_RECOGNITION_RESULTS = PACKAGE_NAME + ".ACTION_ACTIVITY_RECOGNITION_RESULTS";
+    public static final String PROPERTY_LAST_ACTIVITIES_DETECTED = "last_activities_detected";
 }

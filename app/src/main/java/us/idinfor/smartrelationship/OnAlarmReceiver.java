@@ -33,7 +33,7 @@ public class OnAlarmReceiver extends BroadcastReceiver {
         context.startService(new Intent(context, AudioRecorderService.class));
         context.startService(new Intent(context, BluetoothScanService.class));
         context.startService(new Intent(context, WifiScanService.class));
-        //context.startService(new Intent(context, ActivityRecognitionService.class));
+        context.sendBroadcast(new Intent(context, ActivityRecognitionReceiver.class));
 
     }
 }
