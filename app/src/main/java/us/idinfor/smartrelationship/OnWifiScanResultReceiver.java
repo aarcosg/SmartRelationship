@@ -28,7 +28,11 @@ public class OnWifiScanResultReceiver extends BroadcastReceiver {
             List<ScanResult> networks = wifiManager.getScanResults();
             List<WifiNetwork> wifiNetworks = new ArrayList<>();
             for(ScanResult scanResult : networks){
-                WifiNetwork wifiNetwork = new WifiNetwork(scanResult.BSSID,scanResult.SSID,scanResult.frequency,scanResult.level,scanResult.timestamp);
+                WifiNetwork wifiNetwork = new WifiNetwork(scanResult.BSSID
+                        ,scanResult.SSID
+                        ,scanResult.frequency
+                        ,scanResult.level
+                        ,scanResult.timestamp);
                 wifiNetworks.add(wifiNetwork);
             }
             Gson gson = new Gson();
@@ -39,7 +43,8 @@ public class OnWifiScanResultReceiver extends BroadcastReceiver {
                     ,System.currentTimeMillis()
                     ,null
                     ,wifiNetworks);
-            Utils.writeToLogFile(Constants.WIFI_LOG_FOLDER,listeningId,gson.toJson(logRecord));
+            Utils.writeToLogFile(Constants.WIFI_LOG_FOLDER
+                    ,Utils.getTimeStamp() + ";" + listeningId + ";" + gson.toJson(logRecord));
         }
 
     }

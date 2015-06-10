@@ -3,15 +3,15 @@
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
-    <string name="bluetooth_scan_frecuency">Bluetooth scan frecuency (seconds)</string>
+    <string name="sample_scan_frequency">Sample scan frequency (seconds)</string>
     <string name="voice_record_duration">Voice record duration (seconds)</string>
     <string name="save">Save</string>
     <string name="start">Start</string>
     <string name="stop">Stop</string>
     <string name="preferences">Preferences</string>
-    <string name="error_scan_frecuency">Scan frecuency must be greater than 0</string>
+    <string name="error_scan_frequency">Scan frequency must be greater than 30</string>
     <string name="error_record_duration">Record duration must be greater than 0</string>
-    <string name="error_scan_freq_lower_record_duration">Scan frecuency must be greater than record duration</string>
+    <string name="error_scan_freq_lower_record_duration">Scan frequency must be greater than record duration</string>
     <string name="connected">Connected</string>
     <string name="disconnected">Disconnected</string>
     <string name="preferences_saved">Preferences saved</string>

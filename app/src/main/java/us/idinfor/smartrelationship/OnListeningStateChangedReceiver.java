@@ -36,17 +36,18 @@ public class OnListeningStateChangedReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        Log.i(TAG,"OnListeningStateChangedReceiver@onReceive");
         setBackgroundServicesState(context, Utils.getSharedPreferences(context).getBoolean(Constants.PROPERTY_LISTENING, true));
         alarmManager = getAlarmManagerInstance(context);
         Intent i = new Intent(context, OnAlarmReceiver.class);
         PendingIntent pi = PendingIntent.getBroadcast(context, 0, i, 0);
-        if (TextUtils.equals(intent.getAction(), Constants.START_LISTENING)) {
+        if (TextUtils.equals(intent.getAction(), Constants.ACTION_START_LISTENING)) {
             Log.i(TAG, "Set Alarm Manager");
             alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
                     SystemClock.elapsedRealtime() + 60000,
-                    Utils.getSharedPreferences(context).getInt(Constants.PROPERTY_BLUETOOTH_SCAN_FRECUENCY, 30) * 1000,
+                    Utils.getSharedPreferences(context).getInt(Constants.PROPERTY_SAMPLE_SCAN_FREQUENCY, 30) * 1000,
                     pi);
-        } else if (TextUtils.equals(intent.getAction(), Constants.STOP_LISTENING)) {
+        } else if (TextUtils.equals(intent.getAction(), Constants.ACTION_STOP_LISTENING)) {
             Log.i(TAG, "Cancel Alarm Manager");
             alarmManager.cancel(pi);
             Log.i(TAG, "Cancel bluetooth discovery");

@@ -9,6 +9,8 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+    <uses-permission
+        android:name="com.google.android.gms.permission.ACTIVITY_RECOGNITION"/>
 
     <application
         android:allowBackup="true"
@@ -26,8 +28,8 @@
         </activity>
         <receiver android:name=".OnListeningStateChangedReceiver">
             <intent-filter>
-                <action android:name="us.idinfor.smartrelationship.START_LISTENING" />
-                <action android:name="us.idinfor.smartrelationship.STOP_LISTENING" />
+                <action android:name="us.idinfor.smartrelationship.ACTION_START_LISTENING" />
+                <action android:name="us.idinfor.smartrelationship.ACTION_STOP_LISTENING" />
             </intent-filter>
         </receiver>
         <!-- Wifi -->
@@ -44,10 +46,17 @@
                 <action android:name="android.bluetooth.adapter.action.DISCOVERY_FINISHED"/>
             </intent-filter>
         </receiver>
+        <!-- Recognition Activity -->
+        <receiver android:name=".OnActivityRecognitionResultReceiver" android:exported="false">
+            <intent-filter>
+                <action android:name="us.idinfor.smartrelationship.ACTION_ACTIVITY_RECOGNITION_RESULTS"/>
+            </intent-filter>
+        </receiver>
         <receiver android:name=".OnAlarmReceiver"/>
         <service android:name=".AudioRecorderService" android:exported="false"/>
         <service android:name=".BluetoothScanService" android:exported="false"/>
         <service android:name=".WifiScanService" android:exported="false"/>
+        <service android:name=".ActivityRecognitionService" android:exported="false"/>
     </application>
 
 </manifest>

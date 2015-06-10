@@ -48,15 +48,15 @@
             android:text="@string/preferences"/>
 
         <android.support.design.widget.TextInputLayout
-            android:id="@+id/bluetooth_scan_frecuency_til"
+            android:id="@+id/sample_scan_frequency_til"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
             <EditText
-                android:id="@+id/bluetooth_scan_frecuency_edit"
+                android:id="@+id/sample_scan_frequency_edit"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/bluetooth_scan_frecuency"
+                android:hint="@string/sample_scan_frequency"
                 android:inputType="number" />
 
         </android.support.design.widget.TextInputLayout>

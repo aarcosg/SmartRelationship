@@ -19,7 +19,6 @@ public class AudioRecorderService extends WakefulIntentService {
 
     @Override
     protected void doWakefulWork(Intent intent) {
-        //recorder = getMediaRecorderInstance();
         if (recorder == null) {
             recorder = new MediaRecorder();
         }
@@ -27,8 +26,8 @@ public class AudioRecorderService extends WakefulIntentService {
         String path = Environment.getExternalStorageDirectory().getAbsolutePath()
                 + "/" + Constants.ROOT_FOLDER
                 + "/" + Constants.AUDIO_RECORDER_FOLDER
-                + "/" + Utils.getSharedPreferences(this).getLong(Constants.PROPERTY_LISTENING_ID, 0L)
-                + "_" + System.currentTimeMillis()
+                + "/" + Utils.getDateTimeStamp()
+                + "_" + Utils.getSharedPreferences(this).getLong(Constants.PROPERTY_LISTENING_ID, 0L)
                 + Constants.AUDIO_RECORDER_FILE_EXT;
         File directory = new File(path).getParentFile();
         if (!directory.exists() && !directory.mkdirs()) {
@@ -51,15 +50,5 @@ public class AudioRecorderService extends WakefulIntentService {
         } catch (Exception e) {
             Log.e(TAG, e.getMessage());
         }
-
     }
-
-    private MediaRecorder getMediaRecorderInstance() {
-        if (recorder == null) {
-            recorder = new MediaRecorder();
-        }
-        return recorder;
-    }
-
-
 }

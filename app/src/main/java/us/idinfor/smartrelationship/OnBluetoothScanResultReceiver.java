@@ -16,7 +16,7 @@ public class OnBluetoothScanResultReceiver extends BroadcastReceiver {
 
     private static final String TAG = OnBluetoothScanResultReceiver.class.getCanonicalName();
 
-    private static Set<BluetoothDevice> devices;
+    private static Set<BTDevice> devices;
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -26,7 +26,7 @@ public class OnBluetoothScanResultReceiver extends BroadcastReceiver {
         if(BluetoothDevice.ACTION_FOUND.equals(intent.getAction())){
             BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
             Log.i(TAG, "Bluetooth device found: " + device.getName() + " - " + device.getAddress());
-            getDevices().add(device);
+            getDevices().add(new BTDevice(device.getName(),device.getAddress()));
         } else if (BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(intent.getAction())){
             Log.i(TAG, "Bluetooth discovery started");
 
@@ -40,35 +40,15 @@ public class OnBluetoothScanResultReceiver extends BroadcastReceiver {
                     ,System.currentTimeMillis()
                     ,devices
                     ,null);
-            Utils.writeToLogFile(Constants.BLUETOOTH_LOG_FOLDER,listeningId,gson.toJson(logRecord));
-            /*StringBuilder stringBuilder = new StringBuilder();
-            //Date
-            stringBuilder.append(System.currentTimeMillis());
-            stringBuilder.append(";");
-            //Listening ID
-            stringBuilder.append(Utils.getSharedPreferences(context).getLong(Constants.PROPERTY_LISTENING_ID,0L));
-            stringBuilder.append(";");
-            //Num Devices found
-            stringBuilder.append(devices.size());
-            stringBuilder.append(";");
-            //Devices found
-            for(BluetoothDevice bd : devices){
-                stringBuilder.append("[");
-                stringBuilder.append(bd.getAddress());
-                stringBuilder.append("@");
-                stringBuilder.append(bd.getName());
-                stringBuilder.append("]");
-            }
-            stringBuilder.append(";");
-            stringBuilder.append("\n");
-            Utils.writeToLogFile(stringBuilder.toString());*/
+            Utils.writeToLogFile(Constants.BLUETOOTH_LOG_FOLDER
+                    ,Utils.getTimeStamp() + ";" + listeningId + ";" + gson.toJson(logRecord));
         }
 
     }
 
-    private Set<BluetoothDevice> getDevices(){
+    private Set<BTDevice> getDevices(){
         if(devices == null){
-            devices = new HashSet<BluetoothDevice>();
+            devices = new HashSet<BTDevice>();
         }
         return devices;
     }

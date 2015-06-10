@@ -12,6 +12,8 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class Utils {
 
@@ -26,11 +28,11 @@ public class Utils {
         inputMethodManager.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), 0);
     }
 
-    synchronized public static void writeToLogFile(String folder, Long id, String msg){
+    synchronized public static void writeToLogFile(String folder, String msg){
         File log = new File(Environment.getExternalStorageDirectory().getAbsolutePath()
                 + "/" + Constants.ROOT_FOLDER
                 + "/" + folder
-                + "/" + id + "_" + System.currentTimeMillis() + ".json");
+                + "/" + Utils.getDateStamp()+ "_" + folder + Constants.LOG_FILE_EXT);
         File directory = log.getParentFile();
         if (!directory.exists() && !directory.mkdirs()) {
             Log.e(TAG,"Can't make " + folder + " directory");
@@ -44,8 +46,17 @@ public class Utils {
         }catch (IOException e){
             Log.e(TAG,"Exception appending to log file",e);
         }
-
     }
 
+    public static String getTimeStamp(){
+        return new SimpleDateFormat("HH:mm:ss").format(new Date());
+    }
 
+    public static String getDateStamp(){
+        return new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+    }
+
+    public static String getDateTimeStamp(){
+        return new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+    }
 }

@@ -11,9 +11,13 @@ import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -23,11 +27,12 @@ public class MainActivity extends BaseActivity {
 
     private static final String TAG = MainActivity.class.getCanonicalName();
     private static final int REQUEST_ENABLE_BT = 1;
+    private static final int REQUEST_ENABLE_DISCOVERABLE_BT = 2;
 
-    @InjectView(R.id.bluetooth_scan_frecuency_edit)
-    EditText mBluetoothScanFrecuencyEdit;
-    @InjectView(R.id.bluetooth_scan_frecuency_til)
-    TextInputLayout mBluetoothScanFrecuencyTil;
+    @InjectView(R.id.sample_scan_frequency_edit)
+    EditText mSampleScanfrequencyEdit;
+    @InjectView(R.id.sample_scan_frequency_til)
+    TextInputLayout mSampleScanfrequencyTil;
     @InjectView(R.id.voice_record_duration_edit)
     EditText mVoiceRecordDurationEdit;
     @InjectView(R.id.voice_record_duration_til)
@@ -41,6 +46,7 @@ public class MainActivity extends BaseActivity {
 
     SharedPreferences prefs;
     boolean bluetoothEnabled = false;
+    BluetoothAdapter mBluetoothAdapter;
 
 
     @Override
@@ -58,10 +64,10 @@ public class MainActivity extends BaseActivity {
     @OnClick(R.id.start_listening_btn)
     public void startListening() {
         checkBluetooth();
-        if(bluetoothEnabled){
+        if(checkPlayServices() && bluetoothEnabled){
             setListeningState(true);
             Intent intent = new Intent();
-            intent.setAction(Constants.START_LISTENING);
+            intent.setAction(Constants.ACTION_START_LISTENING);
             sendBroadcast(intent);
             setButtonsEnabledState();
         }
@@ -71,7 +77,7 @@ public class MainActivity extends BaseActivity {
     public void stopListening() {
         setListeningState(false);
         Intent intent = new Intent();
-        intent.setAction(Constants.STOP_LISTENING);
+        intent.setAction(Constants.ACTION_STOP_LISTENING);
         sendBroadcast(intent);
         setButtonsEnabledState();
     }
@@ -79,28 +85,28 @@ public class MainActivity extends BaseActivity {
     @OnClick(R.id.save_btn)
     public void savePreferences(final View view) {
         // Reset errors
-        mBluetoothScanFrecuencyTil.setError(null);
+        mSampleScanfrequencyTil.setError(null);
         mVoiceRecordDurationTil.setError(null);
 
-        String scanFrecuency = mBluetoothScanFrecuencyEdit.getText().toString();
+        String scanfrequency = mSampleScanfrequencyEdit.getText().toString();
         String recordDuration = mVoiceRecordDurationEdit.getText().toString();
 
         boolean cancel = false;
         View focusView = null;
 
         // Check preferences
-        if (TextUtils.isEmpty(scanFrecuency) || (!TextUtils.isEmpty(scanFrecuency) && Integer.valueOf(scanFrecuency) <= 0)) {
-            mBluetoothScanFrecuencyTil.setError(getString(R.string.error_scan_frecuency));
+        if (TextUtils.isEmpty(scanfrequency) || (!TextUtils.isEmpty(scanfrequency) && Integer.valueOf(scanfrequency) <= 0)) {
+            mSampleScanfrequencyTil.setError(getString(R.string.error_scan_frequency));
             cancel = true;
-            focusView = mBluetoothScanFrecuencyEdit;
+            focusView = mSampleScanfrequencyEdit;
         } else if (TextUtils.isEmpty(recordDuration) || (!TextUtils.isEmpty(recordDuration) && Integer.valueOf(recordDuration) <= 0)) {
             mVoiceRecordDurationTil.setError(getString(R.string.error_record_duration));
             cancel = true;
             focusView = mVoiceRecordDurationEdit;
-        } else if (Integer.valueOf(scanFrecuency) <= Integer.valueOf(recordDuration)){
-            mBluetoothScanFrecuencyTil.setError(getString(R.string.error_scan_freq_lower_record_duration));
+        } else if (Integer.valueOf(scanfrequency) <= Integer.valueOf(recordDuration)){
+            mSampleScanfrequencyTil.setError(getString(R.string.error_scan_freq_lower_record_duration));
             cancel = true;
-            focusView = mBluetoothScanFrecuencyEdit;
+            focusView = mSampleScanfrequencyEdit;
         }
 
         if (cancel) {
@@ -108,7 +114,7 @@ public class MainActivity extends BaseActivity {
         } else {
             Utils.hideSoftKeyboard(this);
             prefs.edit()
-                    .putInt(Constants.PROPERTY_BLUETOOTH_SCAN_FRECUENCY, Integer.valueOf(scanFrecuency))
+                    .putInt(Constants.PROPERTY_SAMPLE_SCAN_FREQUENCY, Integer.valueOf(scanfrequency))
                     .putInt(Constants.PROPERTY_VOICE_RECORD_DURATION, Integer.valueOf(recordDuration))
                     .apply();
             Snackbar
@@ -124,13 +130,13 @@ public class MainActivity extends BaseActivity {
         if (getListeningState()) {
             mStartListeningBtn.setEnabled(false);
             mStopListeningBtn.setEnabled(true);
-            mBluetoothScanFrecuencyEdit.setEnabled(false);
+            mSampleScanfrequencyEdit.setEnabled(false);
             mVoiceRecordDurationEdit.setEnabled(false);
             mSaveBtn.setEnabled(false);
         } else {
             mStartListeningBtn.setEnabled(true);
             mStopListeningBtn.setEnabled(false);
-            mBluetoothScanFrecuencyEdit.setEnabled(true);
+            mSampleScanfrequencyEdit.setEnabled(true);
             mVoiceRecordDurationEdit.setEnabled(true);
             mSaveBtn.setEnabled(true);
 
@@ -167,7 +173,7 @@ public class MainActivity extends BaseActivity {
         // Initializes a Bluetooth adapter.  For API level 18 and above, get a reference to
         // BluetoothAdapter through BluetoothManager.
         final BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
-        BluetoothAdapter mBluetoothAdapter = bluetoothManager.getAdapter();
+        mBluetoothAdapter = bluetoothManager.getAdapter();
 
         // Checks if Bluetooth is supported on the device.
         if (mBluetoothAdapter == null) {
@@ -179,9 +185,19 @@ public class MainActivity extends BaseActivity {
             startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
             bluetoothEnabled = false;
         } else {
-            bluetoothEnabled = true;
+            checkBluetoothDiscoverable();
         }
 
+    }
+
+    private void checkBluetoothDiscoverable(){
+        if(mBluetoothAdapter.getScanMode() != BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE){
+            Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+            discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 0);
+            startActivityForResult(discoverableIntent,REQUEST_ENABLE_DISCOVERABLE_BT);
+        }else{
+            bluetoothEnabled = true;
+        }
     }
 
     @Override
@@ -191,6 +207,11 @@ public class MainActivity extends BaseActivity {
             bluetoothEnabled = false;
             return;
         } else if (requestCode == REQUEST_ENABLE_BT && resultCode == Activity.RESULT_OK){
+            /*bluetoothEnabled = true;
+            startListening();
+            return;*/
+            checkBluetoothDiscoverable();
+        } else if (requestCode == REQUEST_ENABLE_DISCOVERABLE_BT && resultCode == Activity.RESULT_OK){
             bluetoothEnabled = true;
             startListening();
             return;
@@ -199,8 +220,27 @@ public class MainActivity extends BaseActivity {
     }
 
     private void loadPreferences() {
-        mBluetoothScanFrecuencyEdit.setText(Integer.valueOf(prefs.getInt(Constants.PROPERTY_BLUETOOTH_SCAN_FRECUENCY,30)).toString());
+        mSampleScanfrequencyEdit.setText(Integer.valueOf(prefs.getInt(Constants.PROPERTY_SAMPLE_SCAN_FREQUENCY,30)).toString());
         mVoiceRecordDurationEdit.setText(Integer.valueOf(prefs.getInt(Constants.PROPERTY_VOICE_RECORD_DURATION,5)).toString());
+    }
+
+    /**
+     * Verify that Google Play services is available.
+     *
+     * @return true if Google Play services is available, otherwise false
+     */
+    protected boolean checkPlayServices() {
+        int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+        if (resultCode != ConnectionResult.SUCCESS) {
+            if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
+                GooglePlayServicesUtil.getErrorDialog(resultCode, this,
+                        Constants.PLAY_SERVICES_RESOLUTION_REQUEST).show();
+            } else {
+                Log.i(TAG, "This device is not supported.");
+            }
+            return false;
+        }
+        return true;
     }
 
 

@@ -1,8 +1,6 @@
 package us.idinfor.smartrelationship;
 
 
-import android.bluetooth.BluetoothDevice;
-
 import java.util.List;
 import java.util.Set;
 
@@ -11,12 +9,12 @@ public class LogRecord {
     private Long id;
     private Type type;
     private Long time;
-    private Set<BluetoothDevice> devices;
+    private Set<BTDevice> devices;
     private List<WifiNetwork> networks;
 
     public LogRecord(){}
 
-    public LogRecord(Long id, Type type, Long time, Set<BluetoothDevice> devices, List<WifiNetwork> networks) {
+    public LogRecord(Long id, Type type, Long time, Set<BTDevice> devices, List<WifiNetwork> networks) {
         this.id = id;
         this.type = type;
         this.time = time;
@@ -40,11 +38,11 @@ public class LogRecord {
         this.time = time;
     }
 
-    public Set<BluetoothDevice> getDevices() {
+    public Set<BTDevice> getDevices() {
         return devices;
     }
 
-    public void setDevices(Set<BluetoothDevice> devices) {
+    public void setDevices(Set<BTDevice> devices) {
         this.devices = devices;
     }
 
@@ -65,6 +63,6 @@ public class LogRecord {
     }
 
     public enum Type{
-        BLUETHOOTH, WIFI
+        BLUETHOOTH, WIFI, ACTIVITY
     }
 }
