@@ -1,4 +1,4 @@
-package us.idinfor.smartrelationship;
+package us.idinfor.smartrelationship.wifi;
 
 
 public class WifiNetwork {

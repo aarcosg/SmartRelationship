@@ -20,6 +20,12 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.util.Log;
 
+import us.idinfor.smartrelationship.activityrecognition.ActivityRecognitionReceiver;
+import us.idinfor.smartrelationship.audio.AudioRecorderService;
+import us.idinfor.smartrelationship.bluetooth.BluetoothScanService;
+import us.idinfor.smartrelationship.deviceorientation.OrientationService;
+import us.idinfor.smartrelationship.wifi.WifiScanService;
+
 public class OnAlarmReceiver extends BroadcastReceiver {
 
     private static final String TAG = OnAlarmReceiver.class.getCanonicalName();
@@ -30,6 +36,7 @@ public class OnAlarmReceiver extends BroadcastReceiver {
         WakefulIntentService.acquireStaticLock(context,Constants.LOCK_ALARM_SERVICE);
         SharedPreferences prefs = Utils.getSharedPreferences(context);
         prefs.edit().putLong(Constants.PROPERTY_LISTENING_ID,prefs.getLong(Constants.PROPERTY_LISTENING_ID,0L)+1L).commit();
+        context.startService(new Intent(context, OrientationService.class));
         context.startService(new Intent(context, AudioRecorderService.class));
         context.startService(new Intent(context, BluetoothScanService.class));
         context.startService(new Intent(context, WifiScanService.class));

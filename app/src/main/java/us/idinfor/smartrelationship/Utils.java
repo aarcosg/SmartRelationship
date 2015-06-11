@@ -1,6 +1,7 @@
 package us.idinfor.smartrelationship;
 
 import android.app.Activity;
+import android.bluetooth.BluetoothClass;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
@@ -87,6 +88,39 @@ public class Utils {
                 return resources.getString(R.string.unknown);
             default:
                 return resources.getString(R.string.unknown);
+        }
+    }
+
+    /**
+     * Returns a human readable String corresponding to a major bluetooth class.
+     */
+    public static String getMajorBluetoothClassString(Context context, int majorBTClass) {
+        Resources resources = context.getResources();
+        switch(majorBTClass) {
+            case BluetoothClass.Device.Major.AUDIO_VIDEO:
+                return resources.getString(R.string.audio_video);
+            case BluetoothClass.Device.Major.COMPUTER:
+                return resources.getString(R.string.computer);
+            case BluetoothClass.Device.Major.HEALTH:
+                return resources.getString(R.string.health);
+            case BluetoothClass.Device.Major.IMAGING:
+                return resources.getString(R.string.imaging);
+            case BluetoothClass.Device.Major.MISC:
+                return resources.getString(R.string.misc);
+            case BluetoothClass.Device.Major.NETWORKING:
+                return resources.getString(R.string.networking);
+            case BluetoothClass.Device.Major.PERIPHERAL:
+                return resources.getString(R.string.peripheral);
+            case BluetoothClass.Device.Major.PHONE:
+                return resources.getString(R.string.phone);
+            case BluetoothClass.Device.Major.TOY:
+                return resources.getString(R.string.toy);
+            case BluetoothClass.Device.Major.UNCATEGORIZED:
+                return resources.getString(R.string.uncategorized);
+            case BluetoothClass.Device.Major.WEARABLE:
+                return resources.getString(R.string.wearable);
+            default:
+                return resources.getString(R.string.uncategorized);
         }
     }
 }

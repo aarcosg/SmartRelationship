@@ -15,7 +15,6 @@
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
-        android:name=".SmartRelationshipApplication"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
@@ -35,13 +34,13 @@
             </intent-filter>
         </receiver>
         <!-- Wifi -->
-        <receiver android:name=".OnWifiScanResultReceiver" android:exported="false">
+        <receiver android:name=".wifi.OnWifiScanResultReceiver" android:exported="false">
             <intent-filter>
                 <action android:name="android.net.wifi.SCAN_RESULTS"/>
             </intent-filter>
         </receiver>
         <!-- Bluetooth -->
-        <receiver android:name=".OnBluetoothScanResultReceiver" android:exported="true">
+        <receiver android:name=".bluetooth.OnBluetoothScanResultReceiver" android:exported="true">
             <intent-filter>
                 <action android:name="android.bluetooth.device.action.FOUND"/>
                 <action android:name="android.bluetooth.adapter.action.DISCOVERY_STARTED"/>
@@ -49,13 +48,14 @@
             </intent-filter>
         </receiver>
         <!-- Activity Recognition -->
-        <receiver android:name=".ActivityRecognitionReceiver"/>
+        <receiver android:name=".activityrecognition.ActivityRecognitionReceiver"/>
 
         <receiver android:name=".OnAlarmReceiver"/>
-        <service android:name=".AudioRecorderService" android:exported="false"/>
-        <service android:name=".BluetoothScanService" android:exported="false"/>
-        <service android:name=".WifiScanService" android:exported="false"/>
-        <service android:name=".OnActivityRecognitionResultService" android:exported="false"/>
+        <service android:name=".audio.AudioRecorderService" android:exported="false"/>
+        <service android:name=".bluetooth.BluetoothScanService" android:exported="false"/>
+        <service android:name=".wifi.WifiScanService" android:exported="false"/>
+        <service android:name=".activityrecognition.OnActivityRecognitionResultService" android:exported="false"/>
+        <service android:name=".deviceorientation.OrientationService" android:exported="false"/>
     </application>
 
 </manifest>

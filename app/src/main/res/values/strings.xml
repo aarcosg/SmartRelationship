@@ -24,4 +24,17 @@
     <string name="tilting">tilting</string>
     <string name="unknown">unknown</string>
     <string name="walking">walking</string>
+
+    <string name="audio_video">audio_video</string>
+    <string name="computer">computer</string>
+    <string name="health">health</string>
+    <string name="imaging">imaging</string>
+    <string name="misc">misc</string>
+    <string name="networking">networking</string>
+    <string name="peripheral">peripheral</string>
+    <string name="phone">phone</string>
+    <string name="toy">toy</string>
+    <string name="uncategorized">uncategorized</string>
+    <string name="wearable">wearable</string>
+
 </resources>

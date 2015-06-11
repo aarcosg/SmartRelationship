@@ -25,6 +25,7 @@ import com.google.android.gms.location.ActivityRecognition;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
+import us.idinfor.smartrelationship.activityrecognition.OnActivityRecognitionResultService;
 
 public class MainActivity extends BaseActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
@@ -54,7 +55,6 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.Connec
     PendingIntent mActivityRecognitionPI;
     boolean startRecognition;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,10 +71,7 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.Connec
         if(!mGoogleApiClient.isConnected()){
             mGoogleApiClient.connect();
         }
-
-
     }
-
 
     @OnClick(R.id.start_listening_btn)
     public void startListening() {
@@ -330,6 +327,4 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.Connec
         );
 
     }
-
-
 }

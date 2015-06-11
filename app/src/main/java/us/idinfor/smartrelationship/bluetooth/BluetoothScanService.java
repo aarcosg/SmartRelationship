@@ -1,4 +1,4 @@
-package us.idinfor.smartrelationship;
+package us.idinfor.smartrelationship.bluetooth;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.util.Log;
+
+import us.idinfor.smartrelationship.WakefulIntentService;
 
 public class BluetoothScanService extends WakefulIntentService {
 

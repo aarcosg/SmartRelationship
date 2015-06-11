@@ -29,6 +29,12 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
+import us.idinfor.smartrelationship.audio.AudioRecorderService;
+import us.idinfor.smartrelationship.bluetooth.BluetoothScanService;
+import us.idinfor.smartrelationship.bluetooth.OnBluetoothScanResultReceiver;
+import us.idinfor.smartrelationship.wifi.OnWifiScanResultReceiver;
+import us.idinfor.smartrelationship.wifi.WifiScanService;
+
 public class OnListeningStateChangedReceiver extends BroadcastReceiver {
 
     private static final String TAG = OnListeningStateChangedReceiver.class.getCanonicalName();

@@ -1,4 +1,4 @@
-package us.idinfor.smartrelationship;
+package us.idinfor.smartrelationship.wifi;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -13,21 +13,27 @@ import com.google.gson.Gson;
 import java.util.ArrayList;
 import java.util.List;
 
+import us.idinfor.smartrelationship.Constants;
+import us.idinfor.smartrelationship.LogRecord;
+import us.idinfor.smartrelationship.Utils;
+import us.idinfor.smartrelationship.WakefulIntentService;
+
 public class OnWifiScanResultReceiver extends BroadcastReceiver {
 
     private static final String TAG = OnWifiScanResultReceiver.class.getCanonicalName();
+    private SharedPreferences prefs;
 
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.i(TAG, "OnWifiScanResultReceiver@onReceive");
-        WakefulIntentService.acquireStaticLock(context,Constants.LOCK_WIFI_SCAN_SERVICE);
-        if(Utils.getSharedPreferences(context).getBoolean(Constants.PROPERTY_LISTENING,false)){
+        WakefulIntentService.acquireStaticLock(context, Constants.LOCK_WIFI_SCAN_SERVICE);
+        prefs = Utils.getSharedPreferences(context);
+        if(prefs.getBoolean(Constants.PROPERTY_LISTENING, false)){
             if (WifiManager.SCAN_RESULTS_AVAILABLE_ACTION.equals(intent.getAction())) {
                 Log.i(TAG,"Wifi networks found");
-                SharedPreferences prefs = Utils.getSharedPreferences(context);
                 WifiManager wifiManager = (WifiManager)context.getSystemService(Context.WIFI_SERVICE);
                 List<ScanResult> networks = wifiManager.getScanResults();
-                List<WifiNetwork> wifiNetworks = new ArrayList<>();
+                final List<WifiNetwork> wifiNetworks = new ArrayList<>();
                 for(ScanResult scanResult : networks){
                     WifiNetwork wifiNetwork = new WifiNetwork(scanResult.BSSID
                             ,scanResult.SSID
@@ -44,9 +50,12 @@ public class OnWifiScanResultReceiver extends BroadcastReceiver {
                         ,System.currentTimeMillis()
                         ,null
                         ,wifiNetworks
-                        ,null);
+                        ,null
+                        ,prefs.getFloat(Constants.PROPERTY_ORIENTATION_AZIMUTH, 0.0f)
+                        ,prefs.getFloat(Constants.PROPERTY_ORIENTATION_PITCH, 0.0f)
+                        ,prefs.getFloat(Constants.PROPERTY_ORIENTATION_ROLL, 0.0f));
                 Utils.writeToLogFile(Constants.WIFI_LOG_FOLDER
-                        ,Utils.getTimeStamp() + ";" + listeningId + ";" + gson.toJson(logRecord));
+                        , Utils.getTimeStamp() + ";" + listeningId + ";" + gson.toJson(logRecord));
             }
         }
 

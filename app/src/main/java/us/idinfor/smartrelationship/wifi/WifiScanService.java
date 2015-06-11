@@ -1,9 +1,11 @@
-package us.idinfor.smartrelationship;
+package us.idinfor.smartrelationship.wifi;
 
 import android.content.Context;
 import android.content.Intent;
 import android.net.wifi.WifiManager;
 import android.util.Log;
+
+import us.idinfor.smartrelationship.WakefulIntentService;
 
 public class WifiScanService extends WakefulIntentService {
 

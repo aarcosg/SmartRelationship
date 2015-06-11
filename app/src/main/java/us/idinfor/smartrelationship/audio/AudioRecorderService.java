@@ -1,4 +1,4 @@
-package us.idinfor.smartrelationship;
+package us.idinfor.smartrelationship.audio;
 
 import android.content.Intent;
 import android.media.MediaRecorder;
@@ -7,6 +7,10 @@ import android.util.Log;
 
 import java.io.File;
 import java.io.IOException;
+
+import us.idinfor.smartrelationship.Constants;
+import us.idinfor.smartrelationship.Utils;
+import us.idinfor.smartrelationship.WakefulIntentService;
 
 public class AudioRecorderService extends WakefulIntentService {
 

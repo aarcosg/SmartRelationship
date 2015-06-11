@@ -1,4 +1,4 @@
-package us.idinfor.smartrelationship;
+package us.idinfor.smartrelationship.activityrecognition;
 
 
 import android.app.IntentService;
@@ -12,10 +12,13 @@ import com.google.gson.Gson;
 import java.util.ArrayList;
 import java.util.List;
 
+import us.idinfor.smartrelationship.Constants;
+import us.idinfor.smartrelationship.Utils;
+
 public class OnActivityRecognitionResultService extends IntentService{
 
     private static final String TAG = OnActivityRecognitionResultService.class.getCanonicalName();
-    private List<us.idinfor.smartrelationship.DetectedActivity> activities;
+    private List<us.idinfor.smartrelationship.activityrecognition.DetectedActivity> activities;
 
     public OnActivityRecognitionResultService(){
         super("OnActivityRecognitionResultService");
@@ -25,15 +28,15 @@ public class OnActivityRecognitionResultService extends IntentService{
     public void onHandleIntent(Intent intent) {
         Log.i(TAG, "OnActivityRecognitionResultService@onHandleIntent");
         if(ActivityRecognitionResult.hasResult(intent)){
-            activities = new ArrayList<us.idinfor.smartrelationship.DetectedActivity>();
+            activities = new ArrayList<us.idinfor.smartrelationship.activityrecognition.DetectedActivity>();
             ActivityRecognitionResult result = ActivityRecognitionResult.extractResult(intent);
             Log.i(TAG,result.toString());
             List<DetectedActivity> detectedActivities = result.getProbableActivities();
             // Log each activity.
             for (DetectedActivity da: detectedActivities) {
-                Log.i(TAG, da.getType() + " " + da.getConfidence() + "%");
-                us.idinfor.smartrelationship.DetectedActivity detectedActivity =
-                        new us.idinfor.smartrelationship.DetectedActivity(Utils.getActivityRecognitionString(this,da.getType()),da.getConfidence());
+                Log.i(TAG, Utils.getActivityRecognitionString(this, da.getType()) + " " + da.getConfidence() + "%");
+                us.idinfor.smartrelationship.activityrecognition.DetectedActivity detectedActivity =
+                        new us.idinfor.smartrelationship.activityrecognition.DetectedActivity(Utils.getActivityRecognitionString(this,da.getType()),da.getConfidence());
                 activities.add(detectedActivity);
             }
             Gson gson = new Gson();
