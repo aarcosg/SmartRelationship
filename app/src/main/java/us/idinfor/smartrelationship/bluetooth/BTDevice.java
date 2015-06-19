@@ -36,4 +36,20 @@ public class BTDevice {
     public void setMajorClass(String majorClass) {
         this.majorClass = majorClass;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        BTDevice btDevice = (BTDevice) o;
+
+        return getAddress().equals(btDevice.getAddress());
+
+    }
+
+    @Override
+    public int hashCode() {
+        return getAddress().hashCode();
+    }
 }
