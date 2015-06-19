@@ -57,7 +57,9 @@ public class OnBluetoothScanResultReceiver extends BroadcastReceiver {
                         ,prefs.getFloat(Constants.PROPERTY_ORIENTATION_ROLL, 0.0f));
                 Utils.writeToLogFile(Constants.BLUETOOTH_LOG_FOLDER
                         ,Utils.getTimeStamp() + ";" + listeningId + ";" + gson.toJson(logRecord));
-                devices.clear();
+                if(devices != null && !devices.isEmpty()){
+                    devices.clear();
+                }
             }
         }
     }
