@@ -8,13 +8,9 @@ import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.util.Log;
 
-import com.google.gson.Gson;
-
-import java.util.ArrayList;
 import java.util.List;
 
 import us.idinfor.smartrelationship.Constants;
-import us.idinfor.smartrelationship.LogRecord;
 import us.idinfor.smartrelationship.Utils;
 import us.idinfor.smartrelationship.WakefulIntentService;
 
@@ -33,7 +29,7 @@ public class OnWifiScanResultReceiver extends BroadcastReceiver {
                 Log.i(TAG,"Wifi networks found");
                 WifiManager wifiManager = (WifiManager)context.getSystemService(Context.WIFI_SERVICE);
                 List<ScanResult> networks = wifiManager.getScanResults();
-                final List<WifiNetwork> wifiNetworks = new ArrayList<>();
+                /*final List<WifiNetwork> wifiNetworks = new ArrayList<>();
                 for(ScanResult scanResult : networks){
                     WifiNetwork wifiNetwork = new WifiNetwork(scanResult.BSSID
                             ,scanResult.SSID
@@ -42,9 +38,10 @@ public class OnWifiScanResultReceiver extends BroadcastReceiver {
                             ,scanResult.timestamp);
                     wifiNetworks.add(wifiNetwork);
                 }
-                Gson gson = new Gson();
+                Gson gson = new Gson();*/
                 Long listeningId = prefs.getLong(Constants.PROPERTY_LISTENING_ID, 0L);
-                LogRecord logRecord = new LogRecord(
+                Long timestamp = prefs.getLong(Constants.PROPERTY_TIMESTAMP,0L);
+                /*LogRecord logRecord = new LogRecord(
                         listeningId
                         ,LogRecord.Type.WIFI
                         ,System.currentTimeMillis()
@@ -55,7 +52,25 @@ public class OnWifiScanResultReceiver extends BroadcastReceiver {
                         ,prefs.getFloat(Constants.PROPERTY_ORIENTATION_PITCH, 0.0f)
                         ,prefs.getFloat(Constants.PROPERTY_ORIENTATION_ROLL, 0.0f));
                 Utils.writeToLogFile(Constants.WIFI_LOG_FOLDER
-                        , Utils.getTimeStamp() + ";" + listeningId + ";" + gson.toJson(logRecord));
+                        , Utils.getTimeStamp() + ";" + listeningId + ";" + gson.toJson(logRecord));*/
+                if(networks != null && !networks.isEmpty()){
+                    for(ScanResult scanResult : networks){
+                        Utils.writeToLogFile(Constants.WIFI_LOG_FOLDER
+                                ,timestamp + Constants.CSV_SEPARATOR
+                                + listeningId + Constants.CSV_SEPARATOR
+                                + scanResult.BSSID + Constants.CSV_SEPARATOR
+                                + scanResult.SSID + Constants.CSV_SEPARATOR
+                                + scanResult.level + Constants.CSV_SEPARATOR
+                                + scanResult.frequency);
+                    }
+                }else{
+                    Utils.writeToLogFile(Constants.WIFI_LOG_FOLDER
+                            ,timestamp + Constants.CSV_SEPARATOR
+                            + listeningId + Constants.CSV_SEPARATOR
+                            + Constants.CSV_SEPARATOR
+                            + Constants.CSV_SEPARATOR
+                            + Constants.CSV_SEPARATOR);
+                }
             }
         }
 

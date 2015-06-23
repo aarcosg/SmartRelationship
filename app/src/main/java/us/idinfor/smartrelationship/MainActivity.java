@@ -11,6 +11,7 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
+import android.support.v7.widget.SwitchCompat;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -45,6 +46,8 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.Connec
     Button mStartListeningBtn;
     @InjectView(R.id.stop_listening_btn)
     Button mStopListeningBtn;
+    @InjectView(R.id.enable_voice_recording)
+    SwitchCompat mVoiceRecordingSwitch;
     @InjectView(R.id.save_btn)
     Button mSaveBtn;
 
@@ -54,6 +57,7 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.Connec
     GoogleApiClient mGoogleApiClient;
     PendingIntent mActivityRecognitionPI;
     boolean startRecognition;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,9 +72,10 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.Connec
         if (mGoogleApiClient == null) {
             buildGoogleApiClient();
         }
-        if(!mGoogleApiClient.isConnected()){
+        if (!mGoogleApiClient.isConnected()) {
             mGoogleApiClient.connect();
         }
+        mVoiceRecordingSwitch.setChecked(prefs.getBoolean(Constants.PROPERTY_RECORD_AUDIO_ENABLED,false));
     }
 
     @OnClick(R.id.start_listening_btn)
@@ -136,6 +141,7 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.Connec
             prefs.edit()
                     .putInt(Constants.PROPERTY_SAMPLE_SCAN_FREQUENCY, Integer.valueOf(scanfrequency))
                     .putInt(Constants.PROPERTY_VOICE_RECORD_DURATION, Integer.valueOf(recordDuration))
+                    .putBoolean(Constants.PROPERTY_RECORD_AUDIO_ENABLED, mVoiceRecordingSwitch.isChecked())
                     .apply();
             Snackbar
                     .make(view, getString(R.string.preferences_saved), Snackbar.LENGTH_LONG).show();
@@ -303,7 +309,7 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.Connec
      */
     private PendingIntent getActivityRecognitionPendingIntent() {
         if (mActivityRecognitionPI == null) {
-            Intent intent = new Intent(this,OnActivityRecognitionResultService.class);
+            Intent intent = new Intent(this, OnActivityRecognitionResultService.class);
             mActivityRecognitionPI = PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         }
         return mActivityRecognitionPI;

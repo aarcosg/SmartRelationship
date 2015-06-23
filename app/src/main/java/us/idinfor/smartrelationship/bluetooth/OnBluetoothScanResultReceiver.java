@@ -14,7 +14,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import us.idinfor.smartrelationship.Constants;
-import us.idinfor.smartrelationship.LogRecord;
 import us.idinfor.smartrelationship.Utils;
 import us.idinfor.smartrelationship.WakefulIntentService;
 
@@ -45,7 +44,8 @@ public class OnBluetoothScanResultReceiver extends BroadcastReceiver {
                 Log.i(TAG, "Bluetooth discovery finished");
                 Gson gson = new Gson();
                 Long listeningId = prefs.getLong(Constants.PROPERTY_LISTENING_ID, 0L);
-                LogRecord logRecord = new LogRecord(
+                Long timestamp = prefs.getLong(Constants.PROPERTY_TIMESTAMP,0L);
+                /*LogRecord logRecord = new LogRecord(
                         listeningId
                         ,LogRecord.Type.BLUETHOOTH
                         ,System.currentTimeMillis()
@@ -54,11 +54,23 @@ public class OnBluetoothScanResultReceiver extends BroadcastReceiver {
                         ,null
                         ,prefs.getFloat(Constants.PROPERTY_ORIENTATION_AZIMUTH,0.0f)
                         ,prefs.getFloat(Constants.PROPERTY_ORIENTATION_PITCH, 0.0f)
-                        ,prefs.getFloat(Constants.PROPERTY_ORIENTATION_ROLL, 0.0f));
-                Utils.writeToLogFile(Constants.BLUETOOTH_LOG_FOLDER
-                        ,Utils.getTimeStamp() + ";" + listeningId + ";" + gson.toJson(logRecord));
+                        ,prefs.getFloat(Constants.PROPERTY_ORIENTATION_ROLL, 0.0f));*/
                 if(devices != null && !devices.isEmpty()){
+                    for(BTDevice bt : devices){
+                        Utils.writeToLogFile(Constants.BLUETOOTH_LOG_FOLDER
+                                ,timestamp + Constants.CSV_SEPARATOR
+                                + listeningId + Constants.CSV_SEPARATOR
+                                + bt.getName() + Constants.CSV_SEPARATOR
+                                + bt.getAddress() + Constants.CSV_SEPARATOR
+                                + bt.getMajorClass());
+                    }
                     devices.clear();
+                }else{
+                    Utils.writeToLogFile(Constants.BLUETOOTH_LOG_FOLDER
+                            ,timestamp + Constants.CSV_SEPARATOR
+                            + listeningId + Constants.CSV_SEPARATOR
+                            + Constants.CSV_SEPARATOR
+                            + Constants.CSV_SEPARATOR);
                 }
             }
         }

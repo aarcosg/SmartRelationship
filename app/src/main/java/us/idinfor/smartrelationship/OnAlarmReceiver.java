@@ -35,12 +35,17 @@ public class OnAlarmReceiver extends BroadcastReceiver {
         Log.i(TAG,"OnAlarmReceiver@onReceive");
         WakefulIntentService.acquireStaticLock(context,Constants.LOCK_ALARM_SERVICE);
         SharedPreferences prefs = Utils.getSharedPreferences(context);
-        prefs.edit().putLong(Constants.PROPERTY_LISTENING_ID,prefs.getLong(Constants.PROPERTY_LISTENING_ID,0L)+1L).commit();
+        prefs.edit().putLong(Constants.PROPERTY_LISTENING_ID,prefs.getLong(Constants.PROPERTY_LISTENING_ID,0L)+1L)
+                .putLong(Constants.PROPERTY_TIMESTAMP,System.currentTimeMillis())
+                .commit();
         context.startService(new Intent(context, OrientationService.class));
-        context.startService(new Intent(context, AudioRecorderService.class));
         context.startService(new Intent(context, BluetoothScanService.class));
         context.startService(new Intent(context, WifiScanService.class));
         context.sendBroadcast(new Intent(context, ActivityRecognitionReceiver.class));
+        if(prefs.getBoolean(Constants.PROPERTY_RECORD_AUDIO_ENABLED,false)){
+            context.startService(new Intent(context, AudioRecorderService.class));
+        }
+
 
     }
 }

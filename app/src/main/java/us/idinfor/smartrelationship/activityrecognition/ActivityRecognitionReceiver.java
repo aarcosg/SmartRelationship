@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import us.idinfor.smartrelationship.Constants;
-import us.idinfor.smartrelationship.LogRecord;
 import us.idinfor.smartrelationship.Utils;
 import us.idinfor.smartrelationship.WakefulIntentService;
 
@@ -31,9 +30,25 @@ public class ActivityRecognitionReceiver extends BroadcastReceiver{
         prefs = Utils.getSharedPreferences(context);
         Gson gson = new Gson();
         Long listeningId = prefs.getLong(Constants.PROPERTY_LISTENING_ID, 0L);
+        Long timestamp = prefs.getLong(Constants.PROPERTY_TIMESTAMP,0L);
         Type listType = new TypeToken<ArrayList<DetectedActivity>>() {}.getType();
         List<DetectedActivity> activities = new Gson().fromJson(prefs.getString(Constants.PROPERTY_LAST_ACTIVITIES_DETECTED,""),listType);
-        LogRecord logRecord = new LogRecord(
+        if(activities != null && !activities.isEmpty()){
+            for(DetectedActivity da : activities){
+                Utils.writeToLogFile(Constants.ACTIVITY_LOG_FOLDER
+                        ,timestamp + Constants.CSV_SEPARATOR
+                        + listeningId + Constants.CSV_SEPARATOR
+                        + da.getActivity() + Constants.CSV_SEPARATOR
+                        + da.getConfidence() + Constants.CSV_SEPARATOR);
+            }
+        }else{
+            Utils.writeToLogFile(Constants.ACTIVITY_LOG_FOLDER
+                    ,timestamp + Constants.CSV_SEPARATOR
+                    + listeningId + Constants.CSV_SEPARATOR
+                    + Constants.CSV_SEPARATOR
+                    + Constants.CSV_SEPARATOR);
+        }
+        /*LogRecord logRecord = new LogRecord(
                 listeningId
                 ,LogRecord.Type.ACTIVITY
                 ,System.currentTimeMillis()
@@ -44,7 +59,7 @@ public class ActivityRecognitionReceiver extends BroadcastReceiver{
                 ,prefs.getFloat(Constants.PROPERTY_ORIENTATION_PITCH, 0.0f)
                 ,prefs.getFloat(Constants.PROPERTY_ORIENTATION_ROLL, 0.0f));
         Utils.writeToLogFile(Constants.ACTIVITY_LOG_FOLDER
-                , Utils.getTimeStamp() + ";" + listeningId + ";" + gson.toJson(logRecord));
+                , Utils.getTimeStamp() + ";" + listeningId + ";" + gson.toJson(logRecord));*/
 
 
         
