@@ -18,7 +18,7 @@ import us.idinfor.smartrelationship.Utils;
 public class OnActivityRecognitionResultService extends IntentService{
 
     private static final String TAG = OnActivityRecognitionResultService.class.getCanonicalName();
-    private List<us.idinfor.smartrelationship.activityrecognition.DetectedActivity> activities;
+    private List<DetectedActivity> activities;
 
     public OnActivityRecognitionResultService(){
         super("OnActivityRecognitionResultService");
@@ -28,16 +28,17 @@ public class OnActivityRecognitionResultService extends IntentService{
     public void onHandleIntent(Intent intent) {
         Log.i(TAG, "OnActivityRecognitionResultService@onHandleIntent");
         if(ActivityRecognitionResult.hasResult(intent)){
-            activities = new ArrayList<us.idinfor.smartrelationship.activityrecognition.DetectedActivity>();
+            activities = new ArrayList<DetectedActivity>();
             ActivityRecognitionResult result = ActivityRecognitionResult.extractResult(intent);
             Log.i(TAG,result.toString());
             List<DetectedActivity> detectedActivities = result.getProbableActivities();
             // Log each activity.
             for (DetectedActivity da: detectedActivities) {
                 Log.i(TAG, Utils.getActivityRecognitionString(this, da.getType()) + " " + da.getConfidence() + "%");
-                us.idinfor.smartrelationship.activityrecognition.DetectedActivity detectedActivity =
+                /*us.idinfor.smartrelationship.activityrecognition.DetectedActivity detectedActivity =
                         new us.idinfor.smartrelationship.activityrecognition.DetectedActivity(Utils.getActivityRecognitionString(this,da.getType()),da.getConfidence());
-                activities.add(detectedActivity);
+                */
+                activities.add(da);
             }
             Gson gson = new Gson();
             Utils.getSharedPreferences(this).edit().putString(Constants.PROPERTY_LAST_ACTIVITIES_DETECTED,gson.toJson(activities)).apply();

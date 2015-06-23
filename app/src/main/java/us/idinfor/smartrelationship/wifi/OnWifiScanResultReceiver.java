@@ -54,22 +54,18 @@ public class OnWifiScanResultReceiver extends BroadcastReceiver {
                 Utils.writeToLogFile(Constants.WIFI_LOG_FOLDER
                         , Utils.getTimeStamp() + ";" + listeningId + ";" + gson.toJson(logRecord));*/
                 if(networks != null && !networks.isEmpty()){
+                    int wifiId = 1;
                     for(ScanResult scanResult : networks){
                         Utils.writeToLogFile(Constants.WIFI_LOG_FOLDER
                                 ,timestamp + Constants.CSV_SEPARATOR
                                 + listeningId + Constants.CSV_SEPARATOR
+                                + wifiId + Constants.CSV_SEPARATOR
                                 + scanResult.BSSID + Constants.CSV_SEPARATOR
                                 + scanResult.SSID + Constants.CSV_SEPARATOR
                                 + scanResult.level + Constants.CSV_SEPARATOR
                                 + scanResult.frequency);
+                        wifiId++;
                     }
-                }else{
-                    Utils.writeToLogFile(Constants.WIFI_LOG_FOLDER
-                            ,timestamp + Constants.CSV_SEPARATOR
-                            + listeningId + Constants.CSV_SEPARATOR
-                            + Constants.CSV_SEPARATOR
-                            + Constants.CSV_SEPARATOR
-                            + Constants.CSV_SEPARATOR);
                 }
             }
         }

@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.util.Log;
 
+import com.google.android.gms.location.DetectedActivity;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -28,18 +29,26 @@ public class ActivityRecognitionReceiver extends BroadcastReceiver{
         Log.i(TAG, "ActivityRecognitionReceiver@onReceive");
         WakefulIntentService.acquireStaticLock(context, Constants.LOCK_ACTIVITY_RECOGNITION_SERVICE);
         prefs = Utils.getSharedPreferences(context);
-        Gson gson = new Gson();
+        //Gson gson = new Gson();
         Long listeningId = prefs.getLong(Constants.PROPERTY_LISTENING_ID, 0L);
         Long timestamp = prefs.getLong(Constants.PROPERTY_TIMESTAMP,0L);
         Type listType = new TypeToken<ArrayList<DetectedActivity>>() {}.getType();
         List<DetectedActivity> activities = new Gson().fromJson(prefs.getString(Constants.PROPERTY_LAST_ACTIVITIES_DETECTED,""),listType);
+        int moving = 0;
         if(activities != null && !activities.isEmpty()){
             for(DetectedActivity da : activities){
+                switch (da.getType()){
+                    case DetectedActivity.IN_VEHICLE:
+                    case DetectedActivity.ON_BICYCLE:
+                    case DetectedActivity.ON_FOOT:
+                        moving += da.getConfidence();
+                        break;
+                }
+
                 Utils.writeToLogFile(Constants.ACTIVITY_LOG_FOLDER
                         ,timestamp + Constants.CSV_SEPARATOR
                         + listeningId + Constants.CSV_SEPARATOR
-                        + da.getActivity() + Constants.CSV_SEPARATOR
-                        + da.getConfidence() + Constants.CSV_SEPARATOR);
+                        + (moving >= 50 ? 1 : 0));
             }
         }else{
             Utils.writeToLogFile(Constants.ACTIVITY_LOG_FOLDER

@@ -56,21 +56,18 @@ public class OnBluetoothScanResultReceiver extends BroadcastReceiver {
                         ,prefs.getFloat(Constants.PROPERTY_ORIENTATION_PITCH, 0.0f)
                         ,prefs.getFloat(Constants.PROPERTY_ORIENTATION_ROLL, 0.0f));*/
                 if(devices != null && !devices.isEmpty()){
+                    int btId = 1;
                     for(BTDevice bt : devices){
                         Utils.writeToLogFile(Constants.BLUETOOTH_LOG_FOLDER
                                 ,timestamp + Constants.CSV_SEPARATOR
                                 + listeningId + Constants.CSV_SEPARATOR
+                                + btId + Constants.CSV_SEPARATOR
                                 + bt.getName() + Constants.CSV_SEPARATOR
                                 + bt.getAddress() + Constants.CSV_SEPARATOR
                                 + bt.getMajorClass());
+                        btId++;
                     }
                     devices.clear();
-                }else{
-                    Utils.writeToLogFile(Constants.BLUETOOTH_LOG_FOLDER
-                            ,timestamp + Constants.CSV_SEPARATOR
-                            + listeningId + Constants.CSV_SEPARATOR
-                            + Constants.CSV_SEPARATOR
-                            + Constants.CSV_SEPARATOR);
                 }
             }
         }
