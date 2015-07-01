@@ -36,20 +36,21 @@ public class ActivityRecognitionReceiver extends BroadcastReceiver{
         List<DetectedActivity> activities = new Gson().fromJson(prefs.getString(Constants.PROPERTY_LAST_ACTIVITIES_DETECTED,""),listType);
         int moving = 0;
         if(activities != null && !activities.isEmpty()){
-            for(DetectedActivity da : activities){
-                switch (da.getType()){
+            for(DetectedActivity da : activities) {
+                switch (da.getType()) {
                     case DetectedActivity.IN_VEHICLE:
                     case DetectedActivity.ON_BICYCLE:
                     case DetectedActivity.ON_FOOT:
                         moving += da.getConfidence();
                         break;
                 }
+            }
 
-                Utils.writeToLogFile(Constants.ACTIVITY_LOG_FOLDER
+             Utils.writeToLogFile(Constants.ACTIVITY_LOG_FOLDER
                         ,timestamp + Constants.CSV_SEPARATOR
                         + listeningId + Constants.CSV_SEPARATOR
                         + (moving >= 50 ? 1 : 0));
-            }
+
         }else{
             Utils.writeToLogFile(Constants.ACTIVITY_LOG_FOLDER
                     ,timestamp + Constants.CSV_SEPARATOR
