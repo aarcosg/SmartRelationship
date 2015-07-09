@@ -42,32 +42,26 @@ public class OnBluetoothScanResultReceiver extends BroadcastReceiver {
 
             } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(intent.getAction())){
                 Log.i(TAG, "Bluetooth discovery finished");
-                Gson gson = new Gson();
+
                 Long listeningId = prefs.getLong(Constants.PROPERTY_LISTENING_ID, 0L);
                 Long timestamp = prefs.getLong(Constants.PROPERTY_TIMESTAMP,0L);
-                /*LogRecord logRecord = new LogRecord(
-                        listeningId
-                        ,LogRecord.Type.BLUETHOOTH
-                        ,System.currentTimeMillis()
-                        ,devices
-                        ,null
-                        ,null
-                        ,prefs.getFloat(Constants.PROPERTY_ORIENTATION_AZIMUTH,0.0f)
-                        ,prefs.getFloat(Constants.PROPERTY_ORIENTATION_PITCH, 0.0f)
-                        ,prefs.getFloat(Constants.PROPERTY_ORIENTATION_ROLL, 0.0f));*/
+
                 if(devices != null && !devices.isEmpty()){
-                    int btId = 1;
                     for(BTDevice bt : devices){
                         Utils.writeToLogFile(Constants.BLUETOOTH_LOG_FOLDER
                                 ,timestamp + Constants.CSV_SEPARATOR
                                 + listeningId + Constants.CSV_SEPARATOR
-                                + btId + Constants.CSV_SEPARATOR
                                 + bt.getName() + Constants.CSV_SEPARATOR
                                 + bt.getAddress() + Constants.CSV_SEPARATOR
                                 + bt.getMajorClass());
-                        btId++;
                     }
                     devices.clear();
+                } else {
+                    Utils.writeToLogFile(Constants.BLUETOOTH_LOG_FOLDER
+                            , timestamp + Constants.CSV_SEPARATOR
+                            + listeningId + Constants.CSV_SEPARATOR
+                            + Constants.CSV_SEPARATOR
+                            + Constants.CSV_SEPARATOR);
                 }
             }
         }
