@@ -29,30 +29,10 @@ public class OnWifiScanResultReceiver extends BroadcastReceiver {
                 Log.i(TAG,"Wifi networks found");
                 WifiManager wifiManager = (WifiManager)context.getSystemService(Context.WIFI_SERVICE);
                 List<ScanResult> networks = wifiManager.getScanResults();
-                /*final List<WifiNetwork> wifiNetworks = new ArrayList<>();
-                for(ScanResult scanResult : networks){
-                    WifiNetwork wifiNetwork = new WifiNetwork(scanResult.BSSID
-                            ,scanResult.SSID
-                            ,scanResult.frequency
-                            ,scanResult.level
-                            ,scanResult.timestamp);
-                    wifiNetworks.add(wifiNetwork);
-                }
-                Gson gson = new Gson();*/
+
                 Long listeningId = prefs.getLong(Constants.PROPERTY_LISTENING_ID, 0L);
                 Long timestamp = prefs.getLong(Constants.PROPERTY_TIMESTAMP,0L);
-                /*LogRecord logRecord = new LogRecord(
-                        listeningId
-                        ,LogRecord.Type.WIFI
-                        ,System.currentTimeMillis()
-                        ,null
-                        ,wifiNetworks
-                        ,null
-                        ,prefs.getFloat(Constants.PROPERTY_ORIENTATION_AZIMUTH, 0.0f)
-                        ,prefs.getFloat(Constants.PROPERTY_ORIENTATION_PITCH, 0.0f)
-                        ,prefs.getFloat(Constants.PROPERTY_ORIENTATION_ROLL, 0.0f));
-                Utils.writeToLogFile(Constants.WIFI_LOG_FOLDER
-                        , Utils.getTimeStamp() + ";" + listeningId + ";" + gson.toJson(logRecord));*/
+
                 if(networks != null && !networks.isEmpty()){
                     int wifiId = 1;
                     for(ScanResult scanResult : networks){
@@ -66,6 +46,15 @@ public class OnWifiScanResultReceiver extends BroadcastReceiver {
                                 + scanResult.frequency);
                         wifiId++;
                     }
+                    networks.clear();
+                }else{
+                    Utils.writeToLogFile(Constants.WIFI_LOG_FOLDER
+                            ,timestamp + Constants.CSV_SEPARATOR
+                            + listeningId + Constants.CSV_SEPARATOR
+                            + Constants.CSV_SEPARATOR
+                            + Constants.CSV_SEPARATOR
+                            + Constants.CSV_SEPARATOR
+                            + Constants.CSV_SEPARATOR);
                 }
             }
         }
