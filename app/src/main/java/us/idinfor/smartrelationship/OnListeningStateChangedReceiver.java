@@ -51,7 +51,7 @@ public class OnListeningStateChangedReceiver extends BroadcastReceiver {
             Log.i(TAG, "Set Alarm Manager");
             alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
                     SystemClock.elapsedRealtime() + 60000,
-                    Utils.getSharedPreferences(context).getInt(Constants.PROPERTY_SAMPLE_SCAN_FREQUENCY, 30) * 1000,
+                    Utils.getSharedPreferences(context).getInt(Constants.PROPERTY_SAMPLE_SCAN_FREQUENCY, Constants.DEFAULT_SAMPLE_SCAN_FREQUENCY) * 1000,
                     pi);
         } else if (TextUtils.equals(intent.getAction(), Constants.ACTION_STOP_LISTENING)) {
             Log.i(TAG, "Cancel Alarm Manager");

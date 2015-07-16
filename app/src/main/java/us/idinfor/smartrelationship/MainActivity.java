@@ -10,13 +10,9 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
-import android.support.design.widget.TextInputLayout;
 import android.support.v7.widget.SwitchCompat;
-import android.text.TextUtils;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -25,6 +21,7 @@ import com.google.android.gms.location.ActivityRecognition;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
 import us.idinfor.smartrelationship.activityrecognition.OnActivityRecognitionResultService;
 
@@ -34,7 +31,7 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.Connec
     private static final int REQUEST_ENABLE_BT = 1;
     private static final int REQUEST_ENABLE_DISCOVERABLE_BT = 2;
 
-    @InjectView(R.id.sample_scan_frequency_edit)
+    /*@InjectView(R.id.sample_scan_frequency_edit)
     EditText mSampleScanfrequencyEdit;
     @InjectView(R.id.sample_scan_frequency_til)
     TextInputLayout mSampleScanfrequencyTil;
@@ -42,14 +39,15 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.Connec
     EditText mVoiceRecordDurationEdit;
     @InjectView(R.id.voice_record_duration_til)
     TextInputLayout mVoiceRecordDurationTil;
+    @InjectView(R.id.save_btn)
+    Button mSaveBtn;*/
     @InjectView(R.id.start_listening_btn)
     Button mStartListeningBtn;
     @InjectView(R.id.stop_listening_btn)
     Button mStopListeningBtn;
     @InjectView(R.id.enable_voice_recording)
     SwitchCompat mVoiceRecordingSwitch;
-    @InjectView(R.id.save_btn)
-    Button mSaveBtn;
+
 
     SharedPreferences prefs;
     boolean bluetoothEnabled = false;
@@ -76,6 +74,14 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.Connec
             mGoogleApiClient.connect();
         }
         mVoiceRecordingSwitch.setChecked(prefs.getBoolean(Constants.PROPERTY_RECORD_AUDIO_ENABLED,false));
+
+    }
+
+
+    @OnCheckedChanged(R.id.enable_voice_recording)
+    public void onVoiceRecordingChecked(boolean checked){
+        prefs.edit().putBoolean(Constants.PROPERTY_RECORD_AUDIO_ENABLED,checked).apply();
+        Snackbar.make(mVoiceRecordingSwitch, getString(R.string.preferences_saved), Snackbar.LENGTH_LONG).show();
     }
 
     @OnClick(R.id.start_listening_btn)
@@ -107,7 +113,7 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.Connec
         }
     }
 
-    @OnClick(R.id.save_btn)
+    /*@OnClick(R.id.save_btn)
     public void savePreferences(final View view) {
         // Reset errors
         mSampleScanfrequencyTil.setError(null);
@@ -147,7 +153,7 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.Connec
                     .make(view, getString(R.string.preferences_saved), Snackbar.LENGTH_LONG).show();
         }
 
-    }
+    }*/
 
     /**
      * Ensures that only one button is enabled at any time.
@@ -156,15 +162,15 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.Connec
         if (getListeningState()) {
             mStartListeningBtn.setEnabled(false);
             mStopListeningBtn.setEnabled(true);
-            mSampleScanfrequencyEdit.setEnabled(false);
+            /*mSampleScanfrequencyEdit.setEnabled(false);
             mVoiceRecordDurationEdit.setEnabled(false);
-            mSaveBtn.setEnabled(false);
+            mSaveBtn.setEnabled(false);*/
         } else {
             mStartListeningBtn.setEnabled(true);
             mStopListeningBtn.setEnabled(false);
-            mSampleScanfrequencyEdit.setEnabled(true);
+            /*mSampleScanfrequencyEdit.setEnabled(true);
             mVoiceRecordDurationEdit.setEnabled(true);
-            mSaveBtn.setEnabled(true);
+            mSaveBtn.setEnabled(true);*/
 
         }
     }
@@ -246,8 +252,15 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.Connec
     }
 
     private void loadPreferences() {
-        mSampleScanfrequencyEdit.setText(Integer.valueOf(prefs.getInt(Constants.PROPERTY_SAMPLE_SCAN_FREQUENCY, 30)).toString());
-        mVoiceRecordDurationEdit.setText(Integer.valueOf(prefs.getInt(Constants.PROPERTY_VOICE_RECORD_DURATION, 5)).toString());
+        /*mSampleScanfrequencyEdit.setText(Integer.valueOf(prefs.getInt(Constants.PROPERTY_SAMPLE_SCAN_FREQUENCY, 30)).toString());
+        mVoiceRecordDurationEdit.setText(Integer.valueOf(prefs.getInt(Constants.PROPERTY_VOICE_RECORD_DURATION, 5)).toString());*/
+        //Save default values of sample scan frequency and voice record duration
+        if(prefs.getInt(Constants.PROPERTY_SAMPLE_SCAN_FREQUENCY,Constants.DEFAULT_SAMPLE_SCAN_FREQUENCY) != Constants.DEFAULT_SAMPLE_SCAN_FREQUENCY){
+            prefs.edit().putInt(Constants.PROPERTY_SAMPLE_SCAN_FREQUENCY,Constants.DEFAULT_SAMPLE_SCAN_FREQUENCY).apply();
+        }
+        if(prefs.getInt(Constants.PROPERTY_VOICE_RECORD_DURATION,Constants.DEFAULT_VOICE_RECORD_DURATION) != Constants.DEFAULT_VOICE_RECORD_DURATION){
+            prefs.edit().putInt(Constants.PROPERTY_VOICE_RECORD_DURATION,Constants.DEFAULT_VOICE_RECORD_DURATION).apply();
+        }
     }
 
     /**

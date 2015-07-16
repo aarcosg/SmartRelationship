@@ -5,6 +5,8 @@ public class Constants {
     public static final String PACKAGE_NAME = "us.idinfor.smartrelationship";
     public static final String PROPERTY_SAMPLE_SCAN_FREQUENCY = "sample_scan_frequency";
     public static final String PROPERTY_VOICE_RECORD_DURATION = "voice_record_duration";
+    public static final Integer DEFAULT_SAMPLE_SCAN_FREQUENCY = 30;
+    public static final Integer DEFAULT_VOICE_RECORD_DURATION = 5;
     public static final String PROPERTY_LISTENING = "listening";
     public static final String PROPERTY_LISTENING_ID  = "listening_id";
     public static final String PROPERTY_LAST_ACTIVITIES_DETECTED = "last_activities_detected";
