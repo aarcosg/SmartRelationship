@@ -14,6 +14,7 @@ import android.support.v7.widget.SwitchCompat;
 import android.util.Log;
 import android.widget.Button;
 
+import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -23,6 +24,7 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
+import io.fabric.sdk.android.Fabric;
 import us.idinfor.smartrelationship.activityrecognition.OnActivityRecognitionResultService;
 
 public class MainActivity extends BaseActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
@@ -60,6 +62,7 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.Connec
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Fabric.with(this, new Crashlytics());
         setContentView(R.layout.activity_main);
         prefs = Utils.getSharedPreferences(this);
         ButterKnife.inject(this);

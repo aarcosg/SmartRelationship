@@ -22,6 +22,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.media.MediaRecorder;
 import android.os.SystemClock;
 import android.text.TextUtils;
 import android.util.Log;
@@ -56,13 +57,14 @@ public class OnListeningStateChangedReceiver extends BroadcastReceiver {
         } else if (TextUtils.equals(intent.getAction(), Constants.ACTION_STOP_LISTENING)) {
             Log.i(TAG, "Cancel Alarm Manager");
             alarmManager.cancel(pi);
-            Log.i(TAG, "Cancel bluetooth discovery");
+            Log.i(TAG, "Cancel Bluetooth Discovery");
             BluetoothManager mBluetoothManager = (BluetoothManager) context.getSystemService(Context.BLUETOOTH_SERVICE);
             if(mBluetoothManager.getAdapter() != null){
                 mBluetoothManager.getAdapter().cancelDiscovery();
             }
+            Log.i(TAG,"Cancel Media Recorder");
+            new MediaRecorder().release();
         }
-
     }
 
     private AlarmManager getAlarmManagerInstance(Context context) {

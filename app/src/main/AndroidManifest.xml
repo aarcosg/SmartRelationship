@@ -56,6 +56,10 @@
         <service android:name=".wifi.WifiScanService" android:exported="false"/>
         <service android:name=".activityrecognition.OnActivityRecognitionResultService" android:exported="false"/>
         <service android:name=".deviceorientation.OrientationService" android:exported="false"/>
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="89731ccf522fdfecb6be5dc0e9cd46c7a631eb34" />
     </application>
 
+    <uses-permission android:name="android.permission.INTERNET" />
 </manifest>
