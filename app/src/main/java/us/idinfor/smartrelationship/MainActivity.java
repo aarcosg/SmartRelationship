@@ -196,11 +196,12 @@ public class MainActivity extends BaseActivity {
             startListening();
             return;
         } else if (requestCode == Constants.REQUEST_EMAIL && resultCode == Activity.RESULT_OK) {
-            if (zipFile != null && zipFile.exists()) {
+            Log.i(TAG,"Zip file sent");
+            /*if (zipFile != null && zipFile.exists()) {
                 if (zipFile.delete()) {
                     Snackbar.make(mVoiceRecordingSwitch, getString(R.string.logs_sent), Snackbar.LENGTH_LONG).show();
                 }
-            }
+            }*/
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
@@ -237,9 +238,8 @@ public class MainActivity extends BaseActivity {
     private void sendMail(File file) {
         Uri uriToZip = Uri.fromFile(file);
         Intent emailIntent = new Intent(Intent.ACTION_SEND);
-        emailIntent.setType("*/*");
-        emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{});
-        emailIntent.putExtra(Intent.EXTRA_SUBJECT, "SmartRelationship logs");
+        emailIntent.setType("application/zip");
+        //emailIntent.putExtra(Intent.EXTRA_SUBJECT, "SmartRelationship logs");
         emailIntent.putExtra(Intent.EXTRA_TEXT, "SmartRelationship logs attached: " + file.getName());
         emailIntent.putExtra(Intent.EXTRA_STREAM, uriToZip);
         startActivityForResult(Intent.createChooser(emailIntent, "Send Logs:"), Constants.REQUEST_EMAIL);
