@@ -33,5 +33,11 @@ public class Constants {
     public static final long ACTIVITY_DETECTION_INTERVAL_IN_MILLISECONDS = 0;
     public static final String ACTION_ACTIVITY_RECOGNITION_RESULTS = PACKAGE_NAME + ".ACTION_ACTIVITY_RECOGNITION_RESULTS";
     public static final String CSV_SEPARATOR = ";";
+    public static final int REQUEST_EMAIL = 100;
+
+    public static final int INI_HOUR = 9;
+    public static final int INI_MINUTE = 0;
+    public static final int END_HOUR = 17;
+    public static final int END_MINUTE = 0;
 
 }

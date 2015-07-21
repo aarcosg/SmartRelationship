@@ -3,6 +3,7 @@ package us.idinfor.smartrelationship.activityrecognition;
 
 import android.app.IntentService;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.util.Log;
 
 import com.google.android.gms.location.ActivityRecognitionResult;
@@ -27,21 +28,24 @@ public class OnActivityRecognitionResultService extends IntentService{
     @Override
     public void onHandleIntent(Intent intent) {
         Log.i(TAG, "OnActivityRecognitionResultService@onHandleIntent");
-        if(ActivityRecognitionResult.hasResult(intent)){
-            activities = new ArrayList<DetectedActivity>();
-            ActivityRecognitionResult result = ActivityRecognitionResult.extractResult(intent);
-            Log.i(TAG,result.toString());
-            List<DetectedActivity> detectedActivities = result.getProbableActivities();
-            // Log each activity.
-            for (DetectedActivity da: detectedActivities) {
-                Log.i(TAG, Utils.getActivityRecognitionString(this, da.getType()) + " " + da.getConfidence() + "%");
+        SharedPreferences prefs = Utils.getSharedPreferences(this);
+        if(prefs.getBoolean(Constants.PROPERTY_LISTENING, false)){
+            if(ActivityRecognitionResult.hasResult(intent)){
+                activities = new ArrayList<DetectedActivity>();
+                ActivityRecognitionResult result = ActivityRecognitionResult.extractResult(intent);
+                Log.i(TAG,result.toString());
+                List<DetectedActivity> detectedActivities = result.getProbableActivities();
+                // Log each activity.
+                for (DetectedActivity da: detectedActivities) {
+                    Log.i(TAG, Utils.getActivityRecognitionString(this, da.getType()) + " " + da.getConfidence() + "%");
                 /*us.idinfor.smartrelationship.activityrecognition.DetectedActivity detectedActivity =
                         new us.idinfor.smartrelationship.activityrecognition.DetectedActivity(Utils.getActivityRecognitionString(this,da.getType()),da.getConfidence());
                 */
-                activities.add(da);
+                    activities.add(da);
+                }
+                Gson gson = new Gson();
+                prefs.edit().putString(Constants.PROPERTY_LAST_ACTIVITIES_DETECTED,gson.toJson(activities)).apply();
             }
-            Gson gson = new Gson();
-            Utils.getSharedPreferences(this).edit().putString(Constants.PROPERTY_LAST_ACTIVITIES_DETECTED,gson.toJson(activities)).apply();
         }
     }
 }

@@ -8,8 +8,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.util.Log;
 
-import com.google.gson.Gson;
-
 import java.util.HashSet;
 import java.util.Set;
 
@@ -30,16 +28,17 @@ public class OnBluetoothScanResultReceiver extends BroadcastReceiver {
         WakefulIntentService.acquireStaticLock(context, Constants.LOCK_BLUETOOTH_SCAN_SERVICE);
         prefs = Utils.getSharedPreferences(context);
         if(prefs.getBoolean(Constants.PROPERTY_LISTENING, false)){
-            if(BluetoothDevice.ACTION_FOUND.equals(intent.getAction())){
+            if (BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(intent.getAction())){
+                Log.i(TAG, "Bluetooth discovery started");
+                devices = new HashSet<BTDevice>();
+
+            } else if(BluetoothDevice.ACTION_FOUND.equals(intent.getAction())){
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 Log.i(TAG, "Bluetooth device found: " + device.getName() + " - " + device.getAddress());
-                getDevices().add(new BTDevice(
+                devices.add(new BTDevice(
                         device.getName()
-                        ,device.getAddress()
-                        ,Utils.getMajorBluetoothClassString(context,device.getBluetoothClass().getMajorDeviceClass())));
-            } else if (BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(intent.getAction())){
-                Log.i(TAG, "Bluetooth discovery started");
-
+                        , device.getAddress()
+                        , Utils.getMajorBluetoothClassString(context, device.getBluetoothClass().getMajorDeviceClass())));
             } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(intent.getAction())){
                 Log.i(TAG, "Bluetooth discovery finished");
 
@@ -47,30 +46,32 @@ public class OnBluetoothScanResultReceiver extends BroadcastReceiver {
                 Long timestamp = prefs.getLong(Constants.PROPERTY_TIMESTAMP,0L);
 
                 if(devices != null && !devices.isEmpty()){
+                    Log.i(TAG,"Write to " + Constants.BLUETOOTH_LOG_FOLDER + " log file. Bluetooth devices found. Listening ID = " + listeningId);
                     for(BTDevice bt : devices){
                         Utils.writeToLogFile(Constants.BLUETOOTH_LOG_FOLDER
-                                ,timestamp + Constants.CSV_SEPARATOR
+                                , timestamp + Constants.CSV_SEPARATOR
                                 + listeningId + Constants.CSV_SEPARATOR
                                 + bt.getName() + Constants.CSV_SEPARATOR
                                 + bt.getAddress() + Constants.CSV_SEPARATOR
                                 + bt.getMajorClass());
                     }
-                    devices.clear();
-                } else {
+                } else if(devices != null) {
+                    Log.i(TAG,"Write to " + Constants.BLUETOOTH_LOG_FOLDER + " log file. Bluetooth devices not found. Listening ID = " + listeningId);
                     Utils.writeToLogFile(Constants.BLUETOOTH_LOG_FOLDER
                             , timestamp + Constants.CSV_SEPARATOR
                             + listeningId + Constants.CSV_SEPARATOR
                             + Constants.CSV_SEPARATOR
                             + Constants.CSV_SEPARATOR);
                 }
+                devices = null;
+            }else{
+                Log.i(TAG,"Write to " + Constants.BLUETOOTH_LOG_FOLDER + " log file. Action not filtered = " + intent.getAction());
+                Utils.writeToLogFile(Constants.BLUETOOTH_LOG_FOLDER
+                        , -1L + Constants.CSV_SEPARATOR
+                        + -1L + Constants.CSV_SEPARATOR
+                        + "ERROR" + Constants.CSV_SEPARATOR
+                        + intent.getAction() + Constants.CSV_SEPARATOR);
             }
         }
-    }
-
-    private Set<BTDevice> getDevices(){
-        if(devices == null){
-            devices = new HashSet<BTDevice>();
-        }
-        return devices;
     }
 }

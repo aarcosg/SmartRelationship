@@ -47,9 +47,10 @@ public class AudioRecorderService extends WakefulIntentService{
         recorder.setOnInfoListener(new MediaRecorder.OnInfoListener() {
             @Override
             public void onInfo(MediaRecorder mr, int what, int extra) {
-                Log.e(TAG,"MediaRecorder onInfo");
+                Log.i(TAG,"MediaRecorder callback");
                 switch (what){
                     case MediaRecorder.MEDIA_RECORDER_INFO_MAX_DURATION_REACHED:
+                        Log.i(TAG,"MediaRecorder callback = MEDIA_RECORDER_INFO_MAX_DURATION_REACHED");
                         mr.reset();
                         mr.release();
                         if(Looper.myLooper()!= null){

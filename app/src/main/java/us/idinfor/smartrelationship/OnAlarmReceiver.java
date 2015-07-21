@@ -32,12 +32,13 @@ public class OnAlarmReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.i(TAG,"OnAlarmReceiver@onReceive");
-        WakefulIntentService.acquireStaticLock(context,Constants.LOCK_ALARM_SERVICE);
+        Log.i(TAG, "OnAlarmReceiver@onReceive");
+        WakefulIntentService.acquireStaticLock(context, Constants.LOCK_ALARM_SERVICE);
         SharedPreferences prefs = Utils.getSharedPreferences(context);
         prefs.edit().putLong(Constants.PROPERTY_LISTENING_ID,prefs.getLong(Constants.PROPERTY_LISTENING_ID,0L)+1L)
                 .putLong(Constants.PROPERTY_TIMESTAMP,System.currentTimeMillis())
                 .commit();
+        Log.i(TAG,"new Listening ID = " + prefs.getLong(Constants.PROPERTY_LISTENING_ID,0L));
         context.startService(new Intent(context, OrientationService.class));
         context.startService(new Intent(context, BluetoothScanService.class));
         context.startService(new Intent(context, WifiScanService.class));

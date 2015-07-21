@@ -1,62 +1,55 @@
 package us.idinfor.smartrelationship;
 
 import android.app.Activity;
-import android.app.PendingIntent;
+import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.SwitchCompat;
 import android.util.Log;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.ActivityRecognition;
+
+import java.io.File;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
 import io.fabric.sdk.android.Fabric;
-import us.idinfor.smartrelationship.activityrecognition.OnActivityRecognitionResultService;
 
-public class MainActivity extends BaseActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class MainActivity extends BaseActivity {
 
     private static final String TAG = MainActivity.class.getCanonicalName();
     private static final int REQUEST_ENABLE_BT = 1;
     private static final int REQUEST_ENABLE_DISCOVERABLE_BT = 2;
 
-    /*@InjectView(R.id.sample_scan_frequency_edit)
-    EditText mSampleScanfrequencyEdit;
-    @InjectView(R.id.sample_scan_frequency_til)
-    TextInputLayout mSampleScanfrequencyTil;
-    @InjectView(R.id.voice_record_duration_edit)
-    EditText mVoiceRecordDurationEdit;
-    @InjectView(R.id.voice_record_duration_til)
-    TextInputLayout mVoiceRecordDurationTil;
-    @InjectView(R.id.save_btn)
-    Button mSaveBtn;*/
     @InjectView(R.id.start_listening_btn)
     Button mStartListeningBtn;
     @InjectView(R.id.stop_listening_btn)
     Button mStopListeningBtn;
     @InjectView(R.id.enable_voice_recording)
     SwitchCompat mVoiceRecordingSwitch;
+    @InjectView(R.id.zip_btn)
+    Button mZipBtn;
+    @InjectView(R.id.version_text)
+    TextView mVersionText;
 
 
     SharedPreferences prefs;
     boolean bluetoothEnabled = false;
     BluetoothAdapter mBluetoothAdapter;
-    GoogleApiClient mGoogleApiClient;
-    PendingIntent mActivityRecognitionPI;
-    boolean startRecognition;
+    File zipFile;
 
 
     @Override
@@ -70,20 +63,18 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.Connec
         setButtonsEnabledState();
         loadPreferences();
         checkPlayServices();
-        if (mGoogleApiClient == null) {
-            buildGoogleApiClient();
+        mVoiceRecordingSwitch.setChecked(prefs.getBoolean(Constants.PROPERTY_RECORD_AUDIO_ENABLED, false));
+        try{
+            mVersionText.setText("v. " + getPackageManager().getPackageInfo(getPackageName(), 0).versionName);
+        }catch (PackageManager.NameNotFoundException e){
+            e.printStackTrace();
         }
-        if (!mGoogleApiClient.isConnected()) {
-            mGoogleApiClient.connect();
-        }
-        mVoiceRecordingSwitch.setChecked(prefs.getBoolean(Constants.PROPERTY_RECORD_AUDIO_ENABLED,false));
-
     }
 
 
     @OnCheckedChanged(R.id.enable_voice_recording)
-    public void onVoiceRecordingChecked(boolean checked){
-        prefs.edit().putBoolean(Constants.PROPERTY_RECORD_AUDIO_ENABLED,checked).apply();
+    public void onVoiceRecordingChecked(boolean checked) {
+        prefs.edit().putBoolean(Constants.PROPERTY_RECORD_AUDIO_ENABLED, checked).apply();
         Snackbar.make(mVoiceRecordingSwitch, getString(R.string.preferences_saved), Snackbar.LENGTH_LONG).show();
     }
 
@@ -96,11 +87,6 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.Connec
             intent.setAction(Constants.ACTION_START_LISTENING);
             sendBroadcast(intent);
             setButtonsEnabledState();
-            if (mGoogleApiClient.isConnected()) {
-                startActivityRecognition();
-            } else {
-                startRecognition = true;
-            }
         }
     }
 
@@ -111,52 +97,21 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.Connec
         intent.setAction(Constants.ACTION_STOP_LISTENING);
         sendBroadcast(intent);
         setButtonsEnabledState();
-        if (mGoogleApiClient.isConnected()) {
-            stopActivityRecognition();
-        }
     }
 
-    /*@OnClick(R.id.save_btn)
-    public void savePreferences(final View view) {
-        // Reset errors
-        mSampleScanfrequencyTil.setError(null);
-        mVoiceRecordDurationTil.setError(null);
-
-        String scanfrequency = mSampleScanfrequencyEdit.getText().toString();
-        String recordDuration = mVoiceRecordDurationEdit.getText().toString();
-
-        boolean cancel = false;
-        View focusView = null;
-
-        // Check preferences
-        if (TextUtils.isEmpty(scanfrequency) || (!TextUtils.isEmpty(scanfrequency) && Integer.valueOf(scanfrequency) <= 0)) {
-            mSampleScanfrequencyTil.setError(getString(R.string.error_scan_frequency));
-            cancel = true;
-            focusView = mSampleScanfrequencyEdit;
-        } else if (TextUtils.isEmpty(recordDuration) || (!TextUtils.isEmpty(recordDuration) && Integer.valueOf(recordDuration) <= 0)) {
-            mVoiceRecordDurationTil.setError(getString(R.string.error_record_duration));
-            cancel = true;
-            focusView = mVoiceRecordDurationEdit;
-        } else if (Integer.valueOf(scanfrequency) <= Integer.valueOf(recordDuration)) {
-            mSampleScanfrequencyTil.setError(getString(R.string.error_scan_freq_lower_record_duration));
-            cancel = true;
-            focusView = mSampleScanfrequencyEdit;
-        }
-
-        if (cancel) {
-            focusView.requestFocus();
-        } else {
-            Utils.hideSoftKeyboard(this);
-            prefs.edit()
-                    .putInt(Constants.PROPERTY_SAMPLE_SCAN_FREQUENCY, Integer.valueOf(scanfrequency))
-                    .putInt(Constants.PROPERTY_VOICE_RECORD_DURATION, Integer.valueOf(recordDuration))
-                    .putBoolean(Constants.PROPERTY_RECORD_AUDIO_ENABLED, mVoiceRecordingSwitch.isChecked())
-                    .apply();
-            Snackbar
-                    .make(view, getString(R.string.preferences_saved), Snackbar.LENGTH_LONG).show();
-        }
-
-    }*/
+    @OnClick(R.id.zip_btn)
+    public void zipAndSendLogs() {
+        ProgressDialog progress = new ProgressDialog(this);
+        progress.setMessage("Zipping files...");
+        new ZipLogsAsyncTask(progress) {
+            @Override
+            public void onPostExecute(String filepath) {
+                super.onPostExecute(filepath);
+                zipFile = new File(filepath);
+                sendMail(zipFile);
+            }
+        }.execute();
+    }
 
     /**
      * Ensures that only one button is enabled at any time.
@@ -165,16 +120,9 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.Connec
         if (getListeningState()) {
             mStartListeningBtn.setEnabled(false);
             mStopListeningBtn.setEnabled(true);
-            /*mSampleScanfrequencyEdit.setEnabled(false);
-            mVoiceRecordDurationEdit.setEnabled(false);
-            mSaveBtn.setEnabled(false);*/
         } else {
             mStartListeningBtn.setEnabled(true);
             mStopListeningBtn.setEnabled(false);
-            /*mSampleScanfrequencyEdit.setEnabled(true);
-            mVoiceRecordDurationEdit.setEnabled(true);
-            mSaveBtn.setEnabled(true);*/
-
         }
     }
 
@@ -242,27 +190,28 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.Connec
             bluetoothEnabled = false;
             return;
         } else if (requestCode == REQUEST_ENABLE_BT && resultCode == Activity.RESULT_OK) {
-            /*bluetoothEnabled = true;
-            startListening();
-            return;*/
             checkBluetoothDiscoverable();
         } else if (requestCode == REQUEST_ENABLE_DISCOVERABLE_BT && resultCode == Activity.RESULT_OK) {
             bluetoothEnabled = true;
             startListening();
             return;
+        } else if (requestCode == Constants.REQUEST_EMAIL && resultCode == Activity.RESULT_OK) {
+            if (zipFile != null && zipFile.exists()) {
+                if (zipFile.delete()) {
+                    Snackbar.make(mVoiceRecordingSwitch, getString(R.string.logs_sent), Snackbar.LENGTH_LONG).show();
+                }
+            }
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
 
     private void loadPreferences() {
-        /*mSampleScanfrequencyEdit.setText(Integer.valueOf(prefs.getInt(Constants.PROPERTY_SAMPLE_SCAN_FREQUENCY, 30)).toString());
-        mVoiceRecordDurationEdit.setText(Integer.valueOf(prefs.getInt(Constants.PROPERTY_VOICE_RECORD_DURATION, 5)).toString());*/
         //Save default values of sample scan frequency and voice record duration
-        if(prefs.getInt(Constants.PROPERTY_SAMPLE_SCAN_FREQUENCY,Constants.DEFAULT_SAMPLE_SCAN_FREQUENCY) != Constants.DEFAULT_SAMPLE_SCAN_FREQUENCY){
-            prefs.edit().putInt(Constants.PROPERTY_SAMPLE_SCAN_FREQUENCY,Constants.DEFAULT_SAMPLE_SCAN_FREQUENCY).apply();
+        if (prefs.getInt(Constants.PROPERTY_SAMPLE_SCAN_FREQUENCY, Constants.DEFAULT_SAMPLE_SCAN_FREQUENCY) != Constants.DEFAULT_SAMPLE_SCAN_FREQUENCY) {
+            prefs.edit().putInt(Constants.PROPERTY_SAMPLE_SCAN_FREQUENCY, Constants.DEFAULT_SAMPLE_SCAN_FREQUENCY).apply();
         }
-        if(prefs.getInt(Constants.PROPERTY_VOICE_RECORD_DURATION,Constants.DEFAULT_VOICE_RECORD_DURATION) != Constants.DEFAULT_VOICE_RECORD_DURATION){
-            prefs.edit().putInt(Constants.PROPERTY_VOICE_RECORD_DURATION,Constants.DEFAULT_VOICE_RECORD_DURATION).apply();
+        if (prefs.getInt(Constants.PROPERTY_VOICE_RECORD_DURATION, Constants.DEFAULT_VOICE_RECORD_DURATION) != Constants.DEFAULT_VOICE_RECORD_DURATION) {
+            prefs.edit().putInt(Constants.PROPERTY_VOICE_RECORD_DURATION, Constants.DEFAULT_VOICE_RECORD_DURATION).apply();
         }
     }
 
@@ -285,68 +234,14 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.Connec
         return true;
     }
 
-    /**
-     * Builds a GoogleApiClient. Uses the {@code #addApi} method to request the
-     * ActivityRecognition API.
-     */
-    protected synchronized void buildGoogleApiClient() {
-        Log.d(TAG, "Building GoogleApiClient");
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(ActivityRecognition.API)
-                .build();
-    }
-
-    @Override
-    public void onConnected(Bundle bundle) {
-        Log.i(TAG, "Google Play Services connected");
-        if (startRecognition) {
-            startActivityRecognition();
-            startRecognition = false;
-        }
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-        // The connection to Google Play services was lost for some reason. We call connect() to
-        // attempt to re-establish the connection.
-        Log.w(TAG, "Google Play Services connection suspended");
-        mGoogleApiClient.connect();
-    }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-        Log.w(TAG, "Google Play Services connection failed");
-    }
-
-    /**
-     * Gets a PendingIntent to be sent for each activity detection.
-     */
-    private PendingIntent getActivityRecognitionPendingIntent() {
-        if (mActivityRecognitionPI == null) {
-            Intent intent = new Intent(this, OnActivityRecognitionResultService.class);
-            mActivityRecognitionPI = PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        }
-        return mActivityRecognitionPI;
-    }
-
-    private void startActivityRecognition() {
-        Log.i(TAG, "startActivityRecognition");
-        ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates(
-                mGoogleApiClient,
-                prefs.getInt(Constants.PROPERTY_SAMPLE_SCAN_FREQUENCY, 30) / 2,
-                getActivityRecognitionPendingIntent()
-        );
-
-    }
-
-    private void stopActivityRecognition() {
-        Log.i(TAG, "stoptActivityRecognition");
-        ActivityRecognition.ActivityRecognitionApi.removeActivityUpdates(
-                mGoogleApiClient,
-                getActivityRecognitionPendingIntent()
-        );
-
+    private void sendMail(File file) {
+        Uri uriToZip = Uri.fromFile(file);
+        Intent emailIntent = new Intent(Intent.ACTION_SEND);
+        emailIntent.setType("*/*");
+        emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{});
+        emailIntent.putExtra(Intent.EXTRA_SUBJECT, "SmartRelationship logs");
+        emailIntent.putExtra(Intent.EXTRA_TEXT, "SmartRelationship logs attached: " + file.getName());
+        emailIntent.putExtra(Intent.EXTRA_STREAM, uriToZip);
+        startActivityForResult(Intent.createChooser(emailIntent, "Send Logs:"), Constants.REQUEST_EMAIL);
     }
 }

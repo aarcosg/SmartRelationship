@@ -14,10 +14,15 @@ import com.google.android.gms.location.DetectedActivity;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 public class Utils {
 
@@ -63,6 +68,60 @@ public class Utils {
     public static String getDateTimeStamp(){
         return new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
     }
+
+    public static String zipLogFiles(){
+        Log.i(TAG,"Start zipping log files");
+        File rootDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath()
+                + "/" + Constants.ROOT_FOLDER);
+        File zipFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Constants.ROOT_FOLDER + getDateTimeStamp() + ".zip");
+        Calendar currentDate = Calendar.getInstance();
+        currentDate.set(Calendar.HOUR_OF_DAY,0);
+        currentDate.set(Calendar.MINUTE,0);
+        currentDate.set(Calendar.SECOND, 0);
+
+        try{
+            FileOutputStream fout = new FileOutputStream(zipFile);
+            ZipOutputStream zout = new ZipOutputStream(fout);
+            addDirectory(zout, rootDir, currentDate.getTimeInMillis());
+            zout.close();
+        }
+        catch(IOException ioe){
+            Log.e(TAG,"IOException :" + ioe);
+        }
+        Log.i(TAG,"Logs files zipped successfully");
+        return zipFile.getAbsolutePath();
+    }
+
+    private static void addDirectory(ZipOutputStream zout, File fileSource, Long currentDateInMillis) {
+
+        //get sub-folder/files list
+        File[] files = fileSource.listFiles();
+        for(File file : files){
+            //if the file is directory, call the function recursively
+            if(file.isDirectory()){
+                addDirectory(zout, file, currentDateInMillis);
+                continue;
+            }
+            try{
+                if(file.lastModified() < currentDateInMillis){
+                    byte[] buffer = new byte[1024];
+                    FileInputStream fin = new FileInputStream(file);
+                    zout.putNextEntry(new ZipEntry(file.getName()));
+                    int length;
+                    while((length = fin.read(buffer)) > 0){
+                        zout.write(buffer, 0, length);
+                    }
+                    zout.closeEntry();
+                    fin.close();
+                    //file.delete();
+                }
+            }
+            catch(IOException ioe){
+                Log.e(TAG,"IOException :" + ioe);
+            }
+        }
+    }
+
 
     /**
      * Returns a human readable String corresponding to a detected activity type.

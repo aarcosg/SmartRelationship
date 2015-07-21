@@ -26,7 +26,7 @@ public class OnWifiScanResultReceiver extends BroadcastReceiver {
         prefs = Utils.getSharedPreferences(context);
         if(prefs.getBoolean(Constants.PROPERTY_LISTENING, false)){
             if (WifiManager.SCAN_RESULTS_AVAILABLE_ACTION.equals(intent.getAction())) {
-                Log.i(TAG,"Wifi networks found");
+                Log.i(TAG,"Wifi scan results available");
                 WifiManager wifiManager = (WifiManager)context.getSystemService(Context.WIFI_SERVICE);
                 List<ScanResult> networks = wifiManager.getScanResults();
 
@@ -34,6 +34,7 @@ public class OnWifiScanResultReceiver extends BroadcastReceiver {
                 Long timestamp = prefs.getLong(Constants.PROPERTY_TIMESTAMP,0L);
 
                 if(networks != null && !networks.isEmpty()){
+                    Log.i(TAG,"Write to " + Constants.WIFI_LOG_FOLDER + " log file. Wifi networks found. Listening ID = " + listeningId);
                     int wifiId = 1;
                     for(ScanResult scanResult : networks){
                         Utils.writeToLogFile(Constants.WIFI_LOG_FOLDER
@@ -46,8 +47,8 @@ public class OnWifiScanResultReceiver extends BroadcastReceiver {
                                 + scanResult.frequency);
                         wifiId++;
                     }
-                    networks.clear();
                 }else{
+                    Log.i(TAG,"Write to " + Constants.WIFI_LOG_FOLDER + " log file. Wifi networks not found. Listening ID = " + listeningId);
                     Utils.writeToLogFile(Constants.WIFI_LOG_FOLDER
                             ,timestamp + Constants.CSV_SEPARATOR
                             + listeningId + Constants.CSV_SEPARATOR
