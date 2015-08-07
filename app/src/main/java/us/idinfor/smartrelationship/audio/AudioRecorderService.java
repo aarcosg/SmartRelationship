@@ -1,59 +1,67 @@
 package us.idinfor.smartrelationship.audio;
 
+import android.app.IntentService;
+import android.content.Context;
 import android.content.Intent;
-import android.media.MediaRecorder;
 import android.os.Environment;
 import android.util.Log;
 
-import java.io.File;
 import java.io.IOException;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import us.idinfor.smartrelationship.Constants;
 import us.idinfor.smartrelationship.Utils;
-import us.idinfor.smartrelationship.WakefulIntentService;
 
-public class AudioRecorderService extends WakefulIntentService{
+
+public class AudioRecorderService extends IntentService {
 
     private static final String TAG = AudioRecorderService.class.getCanonicalName();
-    public MediaRecorder recorder;
+
+    public static void startActionRecordWav(Context context) {
+        Intent intent = new Intent(context, AudioRecorderService.class);
+        intent.setAction(Constants.ACTION_RECORD_WAV);
+        context.startService(intent);
+    }
 
     public AudioRecorderService() {
         super("AudioRecorderService");
     }
 
     @Override
-    protected void doWakefulWork(Intent intent) {
-        Log.i(TAG, "AudioRecorderService@doWakefulWork");
-        String path = Environment.getExternalStorageDirectory().getAbsolutePath()
-                + "/" + Constants.ROOT_FOLDER
-                + "/" + Constants.AUDIO_RECORDER_FOLDER
-                + "/" + Utils.getDateTimeStamp()
-                + "_" + Utils.getSharedPreferences(this).getLong(Constants.PROPERTY_LISTENING_ID, 0L)
-                + Constants.AUDIO_RECORDER_FILE_EXT;
-        File directory = new File(path).getParentFile();
-        if (!directory.exists() && !directory.mkdirs()) {
-            Log.e(TAG, "Can't make audio recorder directory");
+    protected void onHandleIntent(Intent intent) {
+        if (intent != null) {
+            final String action = intent.getAction();
+            if (Constants.ACTION_RECORD_WAV.equals(action)) {
+                handleActionRecordWav();
+            }
         }
-        if (recorder == null) {
-            recorder = new MediaRecorder();
-        }
-        recorder.reset();
-        recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-        recorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
-        recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
-        recorder.setOutputFile(path);
-        recorder.setMaxDuration(Utils.getSharedPreferences(this).getInt(Constants.PROPERTY_VOICE_RECORD_DURATION, Constants.DEFAULT_VOICE_RECORD_DURATION) * 1000);
+    }
 
-        try {
-            recorder.prepare();
+    private void handleActionRecordWav() {
+        try{
+            String filepath = Environment.getExternalStorageDirectory().getAbsolutePath()
+                    + "/" + Constants.ROOT_FOLDER
+                    + "/" + Constants.AUDIO_RECORDER_FOLDER
+                    + "/" + Utils.getDateTimeStamp()
+                    + "_" + Utils.getSharedPreferences(this).getLong(Constants.PROPERTY_LISTENING_ID, 0L)
+                    + Constants.AUDIO_RECORDER_WAV_EXT;
+            final AudioRecorder recorder = new AudioRecorder(filepath);
             recorder.start();
-        } catch (IOException e) {
-            //Log.e(TAG, e.getMessage());
-            e.printStackTrace();
-        } catch (IllegalStateException e) {
-            //Log.e(TAG, e.getMessage());
+            Log.i(TAG, "Start recorder");
+            Timer myTimer = new Timer();
+            myTimer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    if(recorder.isRecording()){
+                        Log.i(TAG, "Stop recorder");
+                        recorder.stop();
+                    }
+                }
+            }, 5000);
+
+        }catch (IOException e){
             e.printStackTrace();
         }
-
     }
 }

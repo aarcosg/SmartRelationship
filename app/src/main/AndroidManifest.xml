@@ -8,66 +8,79 @@
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
-    <uses-permission
-        android:name="com.google.android.gms.permission.ACTIVITY_RECOGNITION"/>
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="com.google.android.gms.permission.ACTIVITY_RECOGNITION" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
+        android:name=".SmartRelationshipApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
             android:name=".MainActivity"
-            android:label="@string/app_name"
-            android:configChanges="orientation|screenSize">
+            android:configChanges="orientation|screenSize"
+            android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <receiver android:name=".OnListeningStateChangedReceiver">
+
+        <!-- Broadcast Receivers -->
+        <receiver android:name=".OnListeningStateChangedReceiver" >
             <intent-filter>
                 <action android:name="us.idinfor.smartrelationship.ACTION_START_LISTENING" />
                 <action android:name="us.idinfor.smartrelationship.ACTION_STOP_LISTENING" />
             </intent-filter>
         </receiver>
-        <!-- Wifi -->
-        <receiver android:name=".wifi.OnWifiScanResultReceiver" android:exported="false">
+        <receiver
+            android:name=".wifi.WifiScanBroadcastReceiver"
+            android:exported="false" >
             <intent-filter>
-                <action android:name="android.net.wifi.SCAN_RESULTS"/>
+                <action android:name="android.net.wifi.SCAN_RESULTS" />
             </intent-filter>
         </receiver>
-        <!-- Bluetooth -->
-        <receiver android:name=".bluetooth.OnBluetoothScanResultReceiver" android:exported="true">
+        <receiver
+            android:name=".bluetooth.BluetoothScanBroadcastReceiver"
+            android:exported="true" >
             <intent-filter>
-                <action android:name="android.bluetooth.device.action.FOUND"/>
-                <action android:name="android.bluetooth.adapter.action.DISCOVERY_STARTED"/>
-                <action android:name="android.bluetooth.adapter.action.DISCOVERY_FINISHED"/>
+                <action android:name="android.bluetooth.device.action.FOUND" />
+                <action android:name="android.bluetooth.adapter.action.DISCOVERY_STARTED" />
+                <action android:name="android.bluetooth.adapter.action.DISCOVERY_FINISHED" />
             </intent-filter>
         </receiver>
-        <!-- Activity Recognition -->
-        <receiver android:name=".activityrecognition.ActivityRecognitionReceiver"/>
-
         <receiver android:name=".OnBootReceiver" >
             <intent-filter>
-                <action
-                    android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
+        <receiver android:name=".OnAlarmReceiver" />
 
-        <receiver android:name=".OnAlarmReceiver"/>
-        <service android:name=".audio.AudioRecorderService" android:exported="false"/>
-        <service android:name=".bluetooth.BluetoothScanService" android:exported="false"/>
-        <service android:name=".wifi.WifiScanService" android:exported="false"/>
-        <service android:name=".activityrecognition.OnActivityRecognitionResultService" android:exported="false"/>
-        <service android:name=".deviceorientation.OrientationService" android:exported="false"/>
+        <!-- Services -->
+        <service
+            android:name=".bluetooth.BluetoothScanService"
+            android:exported="false" />
+        <service
+            android:name=".wifi.WifiScanService"
+            android:exported="false" />
+        <service
+            android:name=".deviceorientation.OrientationService"
+            android:exported="false" />
+        <service
+            android:name=".audio.AudioRecorderService"
+            android:exported="false" />
+        <service
+            android:name=".activityrecognition.ActivityRecognitionService"
+            android:exported="false" />
+
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="89731ccf522fdfecb6be5dc0e9cd46c7a631eb34" />
+
     </application>
 
-    <uses-permission android:name="android.permission.INTERNET" />
 </manifest>

@@ -113,13 +113,19 @@ public class Utils {
                     }
                     zout.closeEntry();
                     fin.close();
-                    //file.delete();
+                    file.delete();
                 }
             }
             catch(IOException ioe){
                 Log.e(TAG,"IOException :" + ioe);
             }
         }
+    }
+
+    public static boolean isWeekend(){
+        Calendar calendar = Calendar.getInstance();
+        return calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY
+                || calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY;
     }
 
 

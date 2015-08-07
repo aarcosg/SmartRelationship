@@ -16,7 +16,6 @@ import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 
@@ -26,13 +25,13 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
-import io.fabric.sdk.android.Fabric;
 
 public class MainActivity extends BaseActivity {
 
     private static final String TAG = MainActivity.class.getCanonicalName();
     private static final int REQUEST_ENABLE_BT = 1;
     private static final int REQUEST_ENABLE_DISCOVERABLE_BT = 2;
+    private static final int REQUEST_SHARE_ZIP = 3;
 
     @InjectView(R.id.start_listening_btn)
     Button mStartListeningBtn;
@@ -45,17 +44,14 @@ public class MainActivity extends BaseActivity {
     @InjectView(R.id.version_text)
     TextView mVersionText;
 
-
     SharedPreferences prefs;
     boolean bluetoothEnabled = false;
     BluetoothAdapter mBluetoothAdapter;
     File zipFile;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Fabric.with(this, new Crashlytics());
         setContentView(R.layout.activity_main);
         prefs = Utils.getSharedPreferences(this);
         ButterKnife.inject(this);
@@ -195,7 +191,7 @@ public class MainActivity extends BaseActivity {
             bluetoothEnabled = true;
             startListening();
             return;
-        } else if (requestCode == Constants.REQUEST_EMAIL && resultCode == Activity.RESULT_OK) {
+        } else if (requestCode == REQUEST_SHARE_ZIP && resultCode == Activity.RESULT_OK) {
             Log.i(TAG,"Zip file sent");
             /*if (zipFile != null && zipFile.exists()) {
                 if (zipFile.delete()) {
@@ -242,6 +238,6 @@ public class MainActivity extends BaseActivity {
         //emailIntent.putExtra(Intent.EXTRA_SUBJECT, "SmartRelationship logs");
         emailIntent.putExtra(Intent.EXTRA_TEXT, "SmartRelationship logs attached: " + file.getName());
         emailIntent.putExtra(Intent.EXTRA_STREAM, uriToZip);
-        startActivityForResult(Intent.createChooser(emailIntent, "Send Logs:"), Constants.REQUEST_EMAIL);
+        startActivityForResult(Intent.createChooser(emailIntent, "Send Logs:"), REQUEST_SHARE_ZIP);
     }
 }

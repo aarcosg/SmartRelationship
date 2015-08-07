@@ -1,6 +1,8 @@
 package us.idinfor.smartrelationship.deviceorientation;
 
 
+import android.app.IntentService;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.hardware.SensorEvent;
@@ -8,9 +10,8 @@ import android.util.Log;
 
 import us.idinfor.smartrelationship.Constants;
 import us.idinfor.smartrelationship.Utils;
-import us.idinfor.smartrelationship.WakefulIntentService;
 
-public class OrientationService extends WakefulIntentService {
+public class OrientationService extends IntentService {
 
     private static final String TAG = OrientationService.class.getCanonicalName();
 
@@ -18,9 +19,23 @@ public class OrientationService extends WakefulIntentService {
         super("OrientationService");
     }
 
+    public static void startActionSampleOrientation(Context context) {
+        Intent intent = new Intent(context, OrientationService.class);
+        intent.setAction(Constants.ACTION_SAMPLE_ORIENTATION);
+        context.startService(intent);
+    }
+
     @Override
-    protected void doWakefulWork(Intent intent) {
-        Log.i(TAG, "OrientationService@doWakefulWork");
+    protected void onHandleIntent(Intent intent) {
+        if (intent != null) {
+            final String action = intent.getAction();
+            if (Constants.ACTION_SAMPLE_ORIENTATION.equals(action)) {
+                handleActionSampleOrientation();
+            }
+        }
+    }
+
+    private void handleActionSampleOrientation() {
         SensorOrientation sensorOrientation = new SensorOrientation(this) {
             @Override
             public void onSensorChanged(SensorEvent event) {
@@ -29,11 +44,6 @@ public class OrientationService extends WakefulIntentService {
                     this.stopListener();
                     Log.i(TAG,"Sensor data fetched, save on prefs");
                     SharedPreferences prefs = Utils.getSharedPreferences(OrientationService.this);
-                    /*prefs.edit()
-                            .putFloat(Constants.PROPERTY_ORIENTATION_AZIMUTH,this.getAzimuth())
-                            .putFloat(Constants.PROPERTY_ORIENTATION_PITCH,this.getPitch())
-                            .putFloat(Constants.PROPERTY_ORIENTATION_ROLL,this.getRoll())
-                            .commit();*/
                     Long listeningId = prefs.getLong(Constants.PROPERTY_LISTENING_ID, 0L);
                     Long timestamp = prefs.getLong(Constants.PROPERTY_TIMESTAMP,0L);
                     Utils.writeToLogFile(Constants.ORIENTATION_LOG_FOLDER
