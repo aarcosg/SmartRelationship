@@ -94,12 +94,19 @@ public class ActivityRecognitionService extends Service implements GoogleApiClie
     private void handleActionSampleActivityResult(ActivityRecognitionResult result){
         List<DetectedActivity> activities = new ArrayList<DetectedActivity>();
         Log.i(TAG,result.toString());
+        SharedPreferences prefs = Utils.getSharedPreferences(this);
+        Long listeningId = prefs.getLong(Constants.PROPERTY_LISTENING_ID, 0L);
+        Long timestamp = prefs.getLong(Constants.PROPERTY_TIMESTAMP, 0L);
+        Utils.writeToLogFile(Constants.ACTIVITY_LOG_FOLDER + "Debug"
+                , timestamp + Constants.CSV_SEPARATOR
+                + listeningId + Constants.CSV_SEPARATOR
+                + result.toString());
         List<DetectedActivity> detectedActivities = result.getProbableActivities();
         for (DetectedActivity da: detectedActivities) {
             Log.i(TAG, Utils.getActivityRecognitionString(this, da.getType()) + " " + da.getConfidence() + "%");
             activities.add(da);
         }
-        Utils.getSharedPreferences(this).edit().putString(Constants.PROPERTY_LAST_ACTIVITIES_DETECTED, new Gson().toJson(activities)).apply();
+        prefs.edit().putString(Constants.PROPERTY_LAST_ACTIVITIES_DETECTED, new Gson().toJson(activities)).apply();
     }
 
     private void handleActionSampleActivitySave(){

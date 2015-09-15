@@ -39,6 +39,7 @@ public class AudioRecorderService extends IntentService {
     }
 
     private void handleActionRecordWav() {
+        Log.i(TAG,"handleActionRecordWav");
         try{
             String filepath = Environment.getExternalStorageDirectory().getAbsolutePath()
                     + "/" + Constants.ROOT_FOLDER

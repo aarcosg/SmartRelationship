@@ -74,6 +74,9 @@
             android:name=".audio.AudioRecorderService"
             android:exported="false" />
         <service
+            android:name=".audio.AudioMediaRecorderService"
+            android:exported="false" />
+        <service
             android:name=".activityrecognition.ActivityRecognitionService"
             android:exported="false" />
 
