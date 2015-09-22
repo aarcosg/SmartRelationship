@@ -82,7 +82,7 @@ public class Utils {
         try{
             FileOutputStream fout = new FileOutputStream(zipFile);
             ZipOutputStream zout = new ZipOutputStream(fout);
-            addDirectory(zout, rootDir, currentDate.getTimeInMillis());
+            addDirectory(zout, rootDir, rootDir , currentDate.getTimeInMillis());
             zout.close();
         }
         catch(IOException ioe){
@@ -92,21 +92,21 @@ public class Utils {
         return zipFile.getAbsolutePath();
     }
 
-    private static void addDirectory(ZipOutputStream zout, File fileSource, Long currentDateInMillis) {
+    private static void addDirectory(ZipOutputStream zout, File fileSource, File rootDir , Long currentDateInMillis) {
 
         //get sub-folder/files list
         File[] files = fileSource.listFiles();
         for(File file : files){
             //if the file is directory, call the function recursively
             if(file.isDirectory()){
-                addDirectory(zout, file, currentDateInMillis);
+                addDirectory(zout, file, rootDir, currentDateInMillis);
                 continue;
             }
             try{
                 if(file.lastModified() < currentDateInMillis){
                     byte[] buffer = new byte[1024];
                     FileInputStream fin = new FileInputStream(file);
-                    zout.putNextEntry(new ZipEntry(file.getName()));
+                    zout.putNextEntry(new ZipEntry(rootDir.getName() + "/" +fileSource.getName() + "/" +file.getName()));
                     int length;
                     while((length = fin.read(buffer)) > 0){
                         zout.write(buffer, 0, length);
