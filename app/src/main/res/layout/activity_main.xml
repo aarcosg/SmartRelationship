@@ -60,6 +60,7 @@
             android:paddingBottom="8dp"
             android:checked="true"
             android:enabled="false"
+            android:visibility="gone"
             android:text="@string/enable_voice_recording"/>
 
         <!--<android.support.design.widget.TextInputLayout
