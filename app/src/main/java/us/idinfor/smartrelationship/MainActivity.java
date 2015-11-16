@@ -66,6 +66,16 @@ public class MainActivity extends BaseActivity {
         }catch (PackageManager.NameNotFoundException e){
             e.printStackTrace();
         }
+
+        if(getIntent().getIntExtra(Constants.EXTRA_NOTIFICATION,0) > 0){
+            if(mBluetoothAdapter == null){
+                final BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
+                mBluetoothAdapter = bluetoothManager.getAdapter();
+                if(mBluetoothAdapter != null){
+                    checkBluetoothDiscoverable();
+                }
+            }
+        }
     }
 
 

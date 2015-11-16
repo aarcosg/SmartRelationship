@@ -39,5 +39,7 @@
     <string name="toy">toy</string>
     <string name="uncategorized">uncategorized</string>
     <string name="wearable">wearable</string>
+    <string name="notification_title">BT discoverable disabled</string>
+    <string name="notification_description">Your device is not discoverable by others. Please, enable it.</string>
 
 </resources>
