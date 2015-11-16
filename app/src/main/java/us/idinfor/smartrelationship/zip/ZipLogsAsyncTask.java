@@ -1,7 +1,9 @@
-package us.idinfor.smartrelationship;
+package us.idinfor.smartrelationship.zip;
 
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
+
+import us.idinfor.smartrelationship.Utils;
 
 public class ZipLogsAsyncTask extends AsyncTask<Void, Void, String> {
 

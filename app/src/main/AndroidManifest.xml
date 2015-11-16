@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="us.idinfor.smartrelationship" >
+    package="us.idinfor.smartrelationship">
 
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
@@ -18,11 +18,11 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme">
         <activity
             android:name=".MainActivity"
             android:configChanges="orientation|screenSize"
-            android:label="@string/app_name" >
+            android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -31,7 +31,7 @@
         </activity>
 
         <!-- Broadcast Receivers -->
-        <receiver android:name=".OnListeningStateChangedReceiver" >
+        <receiver android:name=".OnListeningStateChangedReceiver">
             <intent-filter>
                 <action android:name="us.idinfor.smartrelationship.ACTION_START_LISTENING" />
                 <action android:name="us.idinfor.smartrelationship.ACTION_STOP_LISTENING" />
@@ -39,21 +39,21 @@
         </receiver>
         <receiver
             android:name=".wifi.WifiScanBroadcastReceiver"
-            android:exported="false" >
+            android:exported="false">
             <intent-filter>
                 <action android:name="android.net.wifi.SCAN_RESULTS" />
             </intent-filter>
         </receiver>
         <receiver
             android:name=".bluetooth.BluetoothScanBroadcastReceiver"
-            android:exported="true" >
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.bluetooth.device.action.FOUND" />
                 <action android:name="android.bluetooth.adapter.action.DISCOVERY_STARTED" />
                 <action android:name="android.bluetooth.adapter.action.DISCOVERY_FINISHED" />
             </intent-filter>
         </receiver>
-        <receiver android:name=".OnBootReceiver" >
+        <receiver android:name=".OnBootReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
@@ -78,6 +78,9 @@
             android:exported="false" />
         <service
             android:name=".activityrecognition.ActivityRecognitionService"
+            android:exported="false" />
+        <service
+            android:name=".zip.ZipLogsIntentService"
             android:exported="false" />
 
         <meta-data

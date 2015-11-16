@@ -25,6 +25,7 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
+import us.idinfor.smartrelationship.zip.ZipLogsAsyncTask;
 
 public class MainActivity extends BaseActivity {
 

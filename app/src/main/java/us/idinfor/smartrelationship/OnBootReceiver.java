@@ -10,11 +10,14 @@ import android.util.Log;
 
 import java.util.Calendar;
 
+import us.idinfor.smartrelationship.zip.ZipLogsIntentService;
+
 public class OnBootReceiver extends WakefulBroadcastReceiver {
 
     private static final String TAG = OnBootReceiver.class.getCanonicalName();
     private static final int REQUEST_START_SAMPLING = 10;
     private static final int REQUEST_FINISH_SAMPLING = 11;
+    private static final int REQUEST_ZIP_LOGS = 12;
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -54,6 +57,18 @@ public class OnBootReceiver extends WakefulBroadcastReceiver {
                 Log.i(TAG,"Device booted between inital time and end time");
                 context.sendBroadcast(new Intent(Constants.ACTION_START_LISTENING));
             }
+
+            // Set auto zip logs alarm
+            Calendar autoZipTime = currentTime;
+            autoZipTime.set(Calendar.HOUR_OF_DAY,Constants.AUTO_ZIP_HOUR);
+            autoZipTime.set(Calendar.MINUTE, Constants.AUTO_ZIP_MINUTE);
+
+            Intent zipLogsIntent = new Intent(context, ZipLogsIntentService.class);
+            zipLogsIntent.setAction(Constants.ACTION_AUTO_ZIP_LOGS);
+            PendingIntent zipLogsPendingIntent = PendingIntent.getService(context, REQUEST_ZIP_LOGS, zipLogsIntent, 0);
+            alarmManager.cancel(zipLogsPendingIntent);
+            alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, autoZipTime.getTimeInMillis(), AlarmManager.INTERVAL_DAY, zipLogsPendingIntent);
+            Log.i(TAG, "Auto zip logs alarm set");
         }
     }
 }

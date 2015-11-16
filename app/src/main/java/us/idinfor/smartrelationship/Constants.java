@@ -55,10 +55,13 @@ public class Constants {
     public static final String ACTION_SAMPLE_ACTIVITY_RESULT = PACKAGE_NAME + ".ACTION_SAMPLE_ACTIVITY_RESULT";
     public static final String ACTION_SAMPLE_ACTIVITY_SAVE = PACKAGE_NAME + ".ACTION_SAMPLE_ACTIVITY_SAVE";
     public static final String ACTION_SAMPLE_ACTIVITY_STOP = PACKAGE_NAME + ".ACTION_SAMPLE_ACTIVITY_STOP";
+    public static final String ACTION_AUTO_ZIP_LOGS = PACKAGE_NAME + ".ACTION_AUTO_ZIP_LOGS";
 
     public static final int INI_HOUR = 9;
     public static final int INI_MINUTE = 1;
     public static final int END_HOUR = 17;
     public static final int END_MINUTE = 1;
+    public static final int AUTO_ZIP_HOUR = 12;
+    public static final int AUTO_ZIP_MINUTE = 1;
 
 }
