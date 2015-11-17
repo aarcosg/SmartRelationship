@@ -41,5 +41,13 @@
     <string name="wearable">wearable</string>
     <string name="notification_title">BT discoverable disabled</string>
     <string name="notification_description">Your device is not discoverable by others. Please, enable it.</string>
+    <string name="status">Status</string>
+    <string name="activity">Activity</string>
+    <string name="audio">Audio</string>
+    <string name="bluetooth">Bluetooth</string>
+    <string name="orientation">Orientation</string>
+    <string name="wifi">Wifi</string>
+    <string name="not_found">Not found</string>
+    <string name="refresh">Refresh status</string>
 
 </resources>

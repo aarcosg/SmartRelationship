@@ -20,5 +20,9 @@
     <dimen name="native_recyclerview_card_margin_right">16dp</dimen>
     <dimen name="native_recyclerview_card_margin_bottom">4dp</dimen>
     <dimen name="native_recyclerview_card_margin_top">4dp</dimen>
+
+    <dimen name="divider_height">1dp</dimen>
+    <dimen name="status_width">30dp</dimen>
+    <dimen name="status_height">20dp</dimen>
 </resources>
 

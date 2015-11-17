@@ -59,15 +59,14 @@ public class OnBootReceiver extends WakefulBroadcastReceiver {
             }
 
             // Set auto zip logs alarm
-            Calendar autoZipTime = currentTime;
-            autoZipTime.set(Calendar.HOUR_OF_DAY,Constants.AUTO_ZIP_HOUR);
-            autoZipTime.set(Calendar.MINUTE, Constants.AUTO_ZIP_MINUTE);
+            currentTime.set(Calendar.HOUR_OF_DAY,Constants.AUTO_ZIP_HOUR);
+            currentTime.set(Calendar.MINUTE, Constants.AUTO_ZIP_MINUTE);
 
             Intent zipLogsIntent = new Intent(context, ZipLogsIntentService.class);
             zipLogsIntent.setAction(Constants.ACTION_AUTO_ZIP_LOGS);
             PendingIntent zipLogsPendingIntent = PendingIntent.getService(context, REQUEST_ZIP_LOGS, zipLogsIntent, 0);
             alarmManager.cancel(zipLogsPendingIntent);
-            alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, autoZipTime.getTimeInMillis(), AlarmManager.INTERVAL_DAY, zipLogsPendingIntent);
+            alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, currentTime.getTimeInMillis(), AlarmManager.INTERVAL_DAY, zipLogsPendingIntent);
             Log.i(TAG, "Auto zip logs alarm set");
         }
     }

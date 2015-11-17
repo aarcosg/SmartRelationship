@@ -11,9 +11,15 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.SwitchCompat;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -45,10 +51,33 @@ public class MainActivity extends BaseActivity {
     @InjectView(R.id.version_text)
     TextView mVersionText;
 
+
     SharedPreferences prefs;
     boolean bluetoothEnabled = false;
     BluetoothAdapter mBluetoothAdapter;
     File zipFile;
+    @InjectView(R.id.activity_status)
+    View mActivityStatus;
+    @InjectView(R.id.activity_sample)
+    TextView mActivitySample;
+    @InjectView(R.id.audio_status)
+    View mAudioStatus;
+    @InjectView(R.id.audio_sample)
+    TextView mAudioSample;
+    @InjectView(R.id.bluetooth_status)
+    View mBluetoothStatus;
+    @InjectView(R.id.bluetooth_sample)
+    TextView mBluetoothSample;
+    @InjectView(R.id.orientation_status)
+    View mOrientationStatus;
+    @InjectView(R.id.orientation_sample)
+    TextView mOrientationSample;
+    @InjectView(R.id.wifi_status)
+    View mWifiStatus;
+    @InjectView(R.id.wifi_sample)
+    TextView mWifiSample;
+    @InjectView(R.id.progressBar)
+    ProgressBar mProgressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,23 +90,30 @@ public class MainActivity extends BaseActivity {
         loadPreferences();
         checkPlayServices();
         mVoiceRecordingSwitch.setChecked(prefs.getBoolean(Constants.PROPERTY_RECORD_AUDIO_ENABLED, false));
-        try{
+        try {
             mVersionText.setText("v. " + getPackageManager().getPackageInfo(getPackageName(), 0).versionName);
-        }catch (PackageManager.NameNotFoundException e){
+        } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
 
-        if(getIntent().getIntExtra(Constants.EXTRA_NOTIFICATION,0) > 0){
-            if(mBluetoothAdapter == null){
+        if (getIntent().getIntExtra(Constants.EXTRA_NOTIFICATION, 0) > 0) {
+            if (mBluetoothAdapter == null) {
                 final BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
                 mBluetoothAdapter = bluetoothManager.getAdapter();
-                if(mBluetoothAdapter != null){
+                if (mBluetoothAdapter != null) {
                     checkBluetoothDiscoverable();
                 }
             }
         }
+
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        setButtonsEnabledState();
+        checkLogStatus();
+    }
 
     @OnCheckedChanged(R.id.enable_voice_recording)
     public void onVoiceRecordingChecked(boolean checked) {
@@ -118,6 +154,25 @@ public class MainActivity extends BaseActivity {
                 sendMail(zipFile);
             }
         }.execute();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.action_refresh:
+                checkLogStatus();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     /**
@@ -203,7 +258,7 @@ public class MainActivity extends BaseActivity {
             startListening();
             return;
         } else if (requestCode == REQUEST_SHARE_ZIP && resultCode == Activity.RESULT_OK) {
-            Log.i(TAG,"Zip file sent");
+            Log.i(TAG, "Zip file sent");
             /*if (zipFile != null && zipFile.exists()) {
                 if (zipFile.delete()) {
                     Snackbar.make(mVoiceRecordingSwitch, getString(R.string.logs_sent), Snackbar.LENGTH_LONG).show();
@@ -250,5 +305,58 @@ public class MainActivity extends BaseActivity {
         emailIntent.putExtra(Intent.EXTRA_TEXT, "SmartRelationship logs attached: " + file.getName());
         emailIntent.putExtra(Intent.EXTRA_STREAM, uriToZip);
         startActivityForResult(Intent.createChooser(emailIntent, "Send Logs:"), REQUEST_SHARE_ZIP);
+    }
+
+    private void checkLogStatus() {
+
+        mProgressBar.setVisibility(View.VISIBLE);
+
+        String activity = Utils.isLogWorking(Constants.ACTIVITY_LOG_FOLDER);
+        String audio = Utils.isLogWorking(Constants.AUDIO_RECORDER_FOLDER);
+        String bluetooth = Utils.isLogWorking(Constants.BLUETOOTH_LOG_FOLDER);
+        String orientation = Utils.isLogWorking(Constants.ORIENTATION_LOG_FOLDER);
+        String wifi = Utils.isLogWorking(Constants.WIFI_LOG_FOLDER);
+
+        if (activity != null) {
+            mActivityStatus.setBackgroundColor(ContextCompat.getColor(this, R.color.status_ok));
+            mActivitySample.setText(activity);
+        } else {
+            mActivityStatus.setBackgroundColor(ContextCompat.getColor(this, R.color.status_error));
+            mActivitySample.setText(getResources().getString(R.string.not_found));
+        }
+
+        if (audio != null) {
+            mAudioStatus.setBackgroundColor(ContextCompat.getColor(this, R.color.status_ok));
+            mAudioSample.setText(audio);
+        } else {
+            mAudioStatus.setBackgroundColor(ContextCompat.getColor(this, R.color.status_error));
+            mAudioSample.setText(getResources().getString(R.string.not_found));
+        }
+
+        if (bluetooth != null) {
+            mBluetoothStatus.setBackgroundColor(ContextCompat.getColor(this, R.color.status_ok));
+            mBluetoothSample.setText(bluetooth);
+        } else {
+            mBluetoothStatus.setBackgroundColor(ContextCompat.getColor(this, R.color.status_error));
+            mBluetoothSample.setText(getResources().getString(R.string.not_found));
+        }
+
+        if (orientation != null) {
+            mOrientationStatus.setBackgroundColor(ContextCompat.getColor(this, R.color.status_ok));
+            mOrientationSample.setText(orientation);
+        } else {
+            mOrientationStatus.setBackgroundColor(ContextCompat.getColor(this, R.color.status_error));
+            mOrientationSample.setText(getResources().getString(R.string.not_found));
+        }
+
+        if (wifi != null) {
+            mWifiStatus.setBackgroundColor(ContextCompat.getColor(this, R.color.status_ok));
+            mWifiSample.setText(wifi);
+        } else {
+            mWifiStatus.setBackgroundColor(ContextCompat.getColor(this, R.color.status_error));
+            mWifiSample.setText(getResources().getString(R.string.not_found));
+        }
+
+        mProgressBar.setVisibility(View.GONE);
     }
 }
