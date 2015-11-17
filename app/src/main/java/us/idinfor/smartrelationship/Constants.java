@@ -60,7 +60,7 @@ public class Constants {
 
     public static final int INI_HOUR = 9;
     public static final int INI_MINUTE = 1;
-    public static final int END_HOUR = 17;
+    public static final int END_HOUR = 18;
     public static final int END_MINUTE = 1;
     public static final int AUTO_ZIP_HOUR = 12;
     public static final int AUTO_ZIP_MINUTE = 1;
