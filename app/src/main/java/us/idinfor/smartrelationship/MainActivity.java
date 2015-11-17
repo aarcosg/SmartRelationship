@@ -198,7 +198,7 @@ public class MainActivity extends BaseActivity {
             return;
         } else if (requestCode == REQUEST_ENABLE_BT && resultCode == Activity.RESULT_OK) {
             checkBluetoothDiscoverable();
-        } else if (requestCode == REQUEST_ENABLE_DISCOVERABLE_BT && resultCode == Activity.RESULT_OK) {
+        } else if (requestCode == REQUEST_ENABLE_DISCOVERABLE_BT && resultCode != Activity.RESULT_CANCELED) {
             bluetoothEnabled = true;
             startListening();
             return;
