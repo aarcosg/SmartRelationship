@@ -50,7 +50,8 @@ public class WifiScanService extends IntentService {
         if (wifiManager.isWifiEnabled()) {
             wifiManager.startScan();
         } else {
-            Log.e(TAG, "Wifi is disabled");
+            Log.i(TAG, "Wifi is disabled. Enable it programmatically");
+            wifiManager.setWifiEnabled(true);
         }
     }
 

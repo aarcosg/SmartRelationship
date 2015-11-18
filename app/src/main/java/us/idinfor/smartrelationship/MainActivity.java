@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
@@ -125,6 +126,10 @@ public class MainActivity extends BaseActivity {
     public void startListening() {
         checkBluetooth();
         if (bluetoothEnabled) {
+            WifiManager wifiManager = (WifiManager)this.getSystemService(Context.WIFI_SERVICE);
+            if(!wifiManager.isWifiEnabled()){
+                wifiManager.setWifiEnabled(true);
+            }
             setListeningState(true);
             Intent intent = new Intent();
             intent.setAction(Constants.ACTION_START_LISTENING);
@@ -253,6 +258,10 @@ public class MainActivity extends BaseActivity {
             return;
         } else if (requestCode == REQUEST_ENABLE_BT && resultCode == Activity.RESULT_OK) {
             checkBluetoothDiscoverable();
+            if(bluetoothEnabled){
+                startListening();
+            }
+            return;
         } else if (requestCode == REQUEST_ENABLE_DISCOVERABLE_BT && resultCode != Activity.RESULT_CANCELED) {
             bluetoothEnabled = true;
             startListening();
