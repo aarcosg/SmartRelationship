@@ -57,6 +57,8 @@ public class Constants {
     public static final String ACTION_SAMPLE_ACTIVITY_STOP = PACKAGE_NAME + ".ACTION_SAMPLE_ACTIVITY_STOP";
     public static final String ACTION_AUTO_ZIP_LOGS = PACKAGE_NAME + ".ACTION_AUTO_ZIP_LOGS";
     public static final String EXTRA_NOTIFICATION = PACKAGE_NAME + ".EXTRA_NOTIFICATION";
+    public static final String EXTRA_BLUETOOTH_RSSI = PACKAGE_NAME + ".EXTRA_BLUETOOTH_RSSI";
+
 
     public static final int INI_HOUR = 9;
     public static final int INI_MINUTE = 1;

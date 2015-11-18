@@ -6,11 +6,13 @@ public class BTDevice {
     private String name;
     private String address;
     private String majorClass;
+    private Short rssi;
 
-    public BTDevice(String name, String address, String majorClass) {
+    public BTDevice(String name, String address, String majorClass, Short rssi) {
         this.name = name;
         this.address = address;
         this.majorClass = majorClass;
+        this.rssi = rssi;
     }
 
     public String getName() {
@@ -35,6 +37,14 @@ public class BTDevice {
 
     public void setMajorClass(String majorClass) {
         this.majorClass = majorClass;
+    }
+
+    public Short getRssi() {
+        return rssi;
+    }
+
+    public void setRssi(Short rssi) {
+        this.rssi = rssi;
     }
 
     @Override

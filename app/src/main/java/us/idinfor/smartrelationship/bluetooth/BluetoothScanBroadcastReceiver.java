@@ -24,7 +24,9 @@ public class BluetoothScanBroadcastReceiver extends WakefulBroadcastReceiver {
                 Log.i(TAG, "Bluetooth discovery started");
             } else if(BluetoothDevice.ACTION_FOUND.equals(intent.getAction())){
                 Log.i(TAG, "New bluetooth device found");
-                BluetoothScanService.startActionBluetoothFound(context,(BluetoothDevice)intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE));
+                BluetoothScanService.startActionBluetoothFound(context,
+                        (BluetoothDevice)intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE),
+                        intent.getShortExtra(BluetoothDevice.EXTRA_RSSI,Short.MIN_VALUE));
             } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(intent.getAction())) {
                 Log.i(TAG, "Bluetooth discovery finished");
                 BluetoothScanService.startActionSampleBluetoothFinished(context);

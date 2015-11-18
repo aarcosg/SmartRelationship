@@ -35,10 +35,11 @@ public class BluetoothScanService extends Service {
         context.startService(intent);
     }
 
-    public static void startActionBluetoothFound(Context context, BluetoothDevice device){
+    public static void startActionBluetoothFound(Context context, BluetoothDevice device, Short RSSI){
         Intent intent = new Intent(context, BluetoothScanService.class);
         intent.setAction(Constants.ACTION_SAMPLE_BLUETOOTH_FOUND);
         intent.putExtra(Constants.EXTRA_BLUETOOTH_DEVICE, device);
+        intent.putExtra(Constants.EXTRA_BLUETOOTH_RSSI, RSSI);
         context.startService(intent);
     }
 
@@ -62,7 +63,8 @@ public class BluetoothScanService extends Service {
                 this.startId = startId;
                 handleActionSampleBluetooth();
             }else if(Constants.ACTION_SAMPLE_BLUETOOTH_FOUND.equals(action)){
-                handleActionBluetoothDeviceFound((BluetoothDevice)intent.getParcelableExtra(Constants.EXTRA_BLUETOOTH_DEVICE));
+                handleActionBluetoothDeviceFound((BluetoothDevice)intent.getParcelableExtra(Constants.EXTRA_BLUETOOTH_DEVICE),
+                        intent.getShortExtra(Constants.EXTRA_BLUETOOTH_RSSI,Short.MIN_VALUE));
             }else if(Constants.ACTION_SAMPLE_BLUETOOTH_FINISHED.equals(action)){
                 handleActionBluetoothDiscoveryFinished();
             }
@@ -121,7 +123,7 @@ public class BluetoothScanService extends Service {
         registerReceiver(mReciever, new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED));
     }*/
 
-    private void handleActionBluetoothDeviceFound(BluetoothDevice device){
+    private void handleActionBluetoothDeviceFound(BluetoothDevice device, Short RSSI){
         Log.i(TAG, "New bluetooth device added: " + device.getName() + " - " + device.getAddress());
         Set<BTDevice> devices = null;
         Gson gson = new Gson();
@@ -134,9 +136,10 @@ public class BluetoothScanService extends Service {
         }
         BTDevice btDevice = new BTDevice(device.getName()
                 ,device.getAddress()
-                ,Utils.getMajorBluetoothClassString(this, device.getBluetoothClass().getMajorDeviceClass()));
+                ,Utils.getMajorBluetoothClassString(this, device.getBluetoothClass().getMajorDeviceClass())
+                ,RSSI);
         devices.add(btDevice);
-        prefs.edit().putString(Constants.PROPERTY_BLUETOOTH_LIST, gson.toJson(devices)).commit();
+        prefs.edit().putString(Constants.PROPERTY_BLUETOOTH_LIST, gson.toJson(devices)).apply();
     }
 
     private void handleActionBluetoothDiscoveryFinished(){
@@ -158,7 +161,8 @@ public class BluetoothScanService extends Service {
                         + listeningId + Constants.CSV_SEPARATOR
                         + bt.getName() + Constants.CSV_SEPARATOR
                         + bt.getAddress() + Constants.CSV_SEPARATOR
-                        + bt.getMajorClass());
+                        + bt.getMajorClass() + Constants.CSV_SEPARATOR
+                        + bt.getRssi());
             }
         } else {
             Log.i(TAG,"Write to " + Constants.BLUETOOTH_LOG_FOLDER + " log file. Bluetooth devices not found. Listening ID = " + listeningId);
